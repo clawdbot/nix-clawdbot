@@ -74,6 +74,7 @@ stdenv.mkDerivation (finalAttrs: {
     GATEWAY_PREBUILD_SH = "${../scripts/gateway-prebuild.sh}";
     PROMOTE_PNPM_INTEGRITY_SH = "${../scripts/promote-pnpm-integrity.sh}";
     REMOVE_PACKAGE_MANAGER_FIELD_SH = "${../scripts/remove-package-manager-field.sh}";
+    STDENV_SETUP = "${stdenv}/setup";
   };
 
   postPatch = "${../scripts/gateway-postpatch.sh}";
