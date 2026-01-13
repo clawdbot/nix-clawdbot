@@ -19,6 +19,16 @@ Defaults:
 Clawdbot packaging:
 - The gateway package must include Control UI assets (run `pnpm ui:build` in the Nix build).
 
+Golden path for pins (yolo + manual bumps):
+- Hourly GitHub Action **Yolo Update Pins** runs `scripts/update-pins.sh`, which:
+  - Picks latest upstream clawdbot SHA with green non-Windows checks
+  - Rebuilds gateway to refresh `pnpmDepsHash`
+  - Regenerates `nix/generated/clawdbot-config-options.nix` from upstream schema
+  - Updates app pin/hash, commits, rebases, pushes to `main`
+- Manual bump (rare): `GH_TOKEN=... scripts/update-pins.sh` (same steps as above). Use only if yolo is blocked.
+- To verify freshness: `git pull --ff-only` and check `nix/sources/clawdbot-source.nix` vs `git ls-remote https://github.com/clawdbot/clawdbot.git refs/heads/main`.
+- If upstream is moving fast and tighter freshness is needed, trigger yolo manually: `gh workflow run "Yolo Update Pins"`.
+
 Philosophy:
 
 The Zen of ~~Python~~ Clawdbot, ~~by~~ shamelessly stolen from Tim Peters
