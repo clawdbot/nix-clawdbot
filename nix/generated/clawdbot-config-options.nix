@@ -4530,6 +4530,17 @@ in
   }; };
   };
 
+  update = lib.mkOption {
+    type = t.submodule { options = {
+    channel = lib.mkOption {
+      type = t.oneOf [ t.enum [ "stable" ] t.enum [ "beta" ] ];
+    };
+    checkOnStart = lib.mkOption {
+      type = t.bool;
+    };
+  }; };
+  };
+
   web = lib.mkOption {
     type = t.submodule { options = {
     enabled = lib.mkOption {
