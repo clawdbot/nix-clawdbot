@@ -20,7 +20,7 @@
     let
       overlay = import ./nix/overlay.nix;
       sourceInfoStable = import ./nix/sources/clawdbot-source.nix;
-      systems = [ "x86_64-linux" "aarch64-darwin" ];
+      systems = [ "x86_64-linux" "aarch64-darwin" "aarch64-linux" ];
     in
     flake-utils.lib.eachSystem systems (system:
       let
