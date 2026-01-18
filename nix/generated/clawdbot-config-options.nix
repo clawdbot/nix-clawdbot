@@ -250,6 +250,16 @@ in
       };
       memorySearch = lib.mkOption {
         type = t.submodule { options = {
+        cache = lib.mkOption {
+          type = t.submodule { options = {
+          enabled = lib.mkOption {
+            type = t.bool;
+          };
+          maxEntries = lib.mkOption {
+            type = t.int;
+          };
+        }; };
+        };
         chunking = lib.mkOption {
           type = t.submodule { options = {
           overlap = lib.mkOption {
@@ -291,6 +301,22 @@ in
         };
         query = lib.mkOption {
           type = t.submodule { options = {
+          hybrid = lib.mkOption {
+            type = t.submodule { options = {
+            candidateMultiplier = lib.mkOption {
+              type = t.int;
+            };
+            enabled = lib.mkOption {
+              type = t.bool;
+            };
+            textWeight = lib.mkOption {
+              type = t.number;
+            };
+            vectorWeight = lib.mkOption {
+              type = t.number;
+            };
+          }; };
+          };
           maxResults = lib.mkOption {
             type = t.int;
           };
@@ -309,6 +335,9 @@ in
           };
           batch = lib.mkOption {
             type = t.submodule { options = {
+            concurrency = lib.mkOption {
+              type = t.int;
+            };
             enabled = lib.mkOption {
               type = t.bool;
             };
@@ -664,6 +693,16 @@ in
       };
       memorySearch = lib.mkOption {
         type = t.submodule { options = {
+        cache = lib.mkOption {
+          type = t.submodule { options = {
+          enabled = lib.mkOption {
+            type = t.bool;
+          };
+          maxEntries = lib.mkOption {
+            type = t.int;
+          };
+        }; };
+        };
         chunking = lib.mkOption {
           type = t.submodule { options = {
           overlap = lib.mkOption {
@@ -705,6 +744,22 @@ in
         };
         query = lib.mkOption {
           type = t.submodule { options = {
+          hybrid = lib.mkOption {
+            type = t.submodule { options = {
+            candidateMultiplier = lib.mkOption {
+              type = t.int;
+            };
+            enabled = lib.mkOption {
+              type = t.bool;
+            };
+            textWeight = lib.mkOption {
+              type = t.number;
+            };
+            vectorWeight = lib.mkOption {
+              type = t.number;
+            };
+          }; };
+          };
           maxResults = lib.mkOption {
             type = t.int;
           };
@@ -723,6 +778,9 @@ in
           };
           batch = lib.mkOption {
             type = t.submodule { options = {
+            concurrency = lib.mkOption {
+              type = t.int;
+            };
             enabled = lib.mkOption {
               type = t.bool;
             };
@@ -1226,6 +1284,13 @@ in
 
   channels = lib.mkOption {
     type = t.submodule { options = {
+    defaults = lib.mkOption {
+      type = t.submodule { options = {
+      groupPolicy = lib.mkOption {
+        type = t.enum [ "open" "disabled" "allowlist" ];
+      };
+    }; };
+    };
     discord = lib.mkOption {
       type = t.submodule { options = {
       accounts = lib.mkOption {
@@ -3750,6 +3815,13 @@ in
       type = t.submodule { options = {
       paths = lib.mkOption {
         type = t.listOf (t.str);
+      };
+    }; };
+    };
+    slots = lib.mkOption {
+      type = t.submodule { options = {
+      memory = lib.mkOption {
+        type = t.str;
       };
     }; };
     };
