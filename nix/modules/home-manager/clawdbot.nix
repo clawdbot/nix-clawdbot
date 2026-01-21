@@ -300,11 +300,28 @@ let
     configPath = "${cfg.stateDir}/clawdbot.json";
     logPath = "/tmp/clawdbot/clawdbot-gateway.log";
     gatewayPort = 18789;
-    providers = cfg.providers;
+    gatewayPath = null;
+    gatewayPnpmDepsHash = lib.fakeHash;
+    providers = {
+      anthropic = cfg.providers.anthropic;
+      telegram = cfg.providers.telegram // {
+        groups = {};
+      };
+    };
     routing = cfg.routing;
-    launchd = cfg.launchd;
-    systemd = cfg.systemd;
+    launchd = {
+      enable = cfg.launchd.enable;
+      label = "com.steipete.clawdbot.gateway";
+    };
+    systemd = {
+      enable = cfg.systemd.enable;
+      unitName = "clawdbot-gateway";
+    };
     plugins = cfg.plugins;
+    agent = {
+      model = cfg.defaults.model;
+      thinkingDefault = cfg.defaults.thinkingDefault;
+    };
     configOverrides = {};
     config = {};
     appDefaults = {

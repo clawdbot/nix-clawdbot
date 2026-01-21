@@ -194,15 +194,6 @@ in
       elevatedDefault = lib.mkOption {
         type = t.oneOf [ t.enum [ "off" ] t.enum [ "on" ] ];
       };
-      envelopeElapsed = lib.mkOption {
-        type = t.oneOf [ t.enum [ "on" ] t.enum [ "off" ] ];
-      };
-      envelopeTimestamp = lib.mkOption {
-        type = t.oneOf [ t.enum [ "on" ] t.enum [ "off" ] ];
-      };
-      envelopeTimezone = lib.mkOption {
-        type = t.str;
-      };
       heartbeat = lib.mkOption {
         type = t.submodule { options = {
         ackMaxChars = lib.mkOption {
@@ -259,16 +250,6 @@ in
       };
       memorySearch = lib.mkOption {
         type = t.submodule { options = {
-        cache = lib.mkOption {
-          type = t.submodule { options = {
-          enabled = lib.mkOption {
-            type = t.bool;
-          };
-          maxEntries = lib.mkOption {
-            type = t.int;
-          };
-        }; };
-        };
         chunking = lib.mkOption {
           type = t.submodule { options = {
           overlap = lib.mkOption {
@@ -282,15 +263,8 @@ in
         enabled = lib.mkOption {
           type = t.bool;
         };
-        experimental = lib.mkOption {
-          type = t.submodule { options = {
-          sessionMemory = lib.mkOption {
-            type = t.bool;
-          };
-        }; };
-        };
         fallback = lib.mkOption {
-          type = t.oneOf [ t.enum [ "openai" ] t.enum [ "gemini" ] t.enum [ "local" ] t.enum [ "none" ] ];
+          type = t.oneOf [ t.enum [ "openai" ] t.enum [ "none" ] ];
         };
         local = lib.mkOption {
           type = t.submodule { options = {
@@ -306,26 +280,10 @@ in
           type = t.str;
         };
         provider = lib.mkOption {
-          type = t.oneOf [ t.enum [ "openai" ] t.enum [ "local" ] t.enum [ "gemini" ] ];
+          type = t.oneOf [ t.enum [ "openai" ] t.enum [ "local" ] ];
         };
         query = lib.mkOption {
           type = t.submodule { options = {
-          hybrid = lib.mkOption {
-            type = t.submodule { options = {
-            candidateMultiplier = lib.mkOption {
-              type = t.int;
-            };
-            enabled = lib.mkOption {
-              type = t.bool;
-            };
-            textWeight = lib.mkOption {
-              type = t.number;
-            };
-            vectorWeight = lib.mkOption {
-              type = t.number;
-            };
-          }; };
-          };
           maxResults = lib.mkOption {
             type = t.int;
           };
@@ -342,32 +300,10 @@ in
           baseUrl = lib.mkOption {
             type = t.str;
           };
-          batch = lib.mkOption {
-            type = t.submodule { options = {
-            concurrency = lib.mkOption {
-              type = t.int;
-            };
-            enabled = lib.mkOption {
-              type = t.bool;
-            };
-            pollIntervalMs = lib.mkOption {
-              type = t.int;
-            };
-            timeoutMinutes = lib.mkOption {
-              type = t.int;
-            };
-            wait = lib.mkOption {
-              type = t.bool;
-            };
-          }; };
-          };
           headers = lib.mkOption {
             type = t.attrsOf (t.str);
           };
         }; };
-        };
-        sources = lib.mkOption {
-          type = t.listOf (t.oneOf [ t.enum [ "memory" ] t.enum [ "sessions" ] ]);
         };
         store = lib.mkOption {
           type = t.submodule { options = {
@@ -376,16 +312,6 @@ in
           };
           path = lib.mkOption {
             type = t.str;
-          };
-          vector = lib.mkOption {
-            type = t.submodule { options = {
-            enabled = lib.mkOption {
-              type = t.bool;
-            };
-            extensionPath = lib.mkOption {
-              type = t.str;
-            };
-          }; };
           };
         }; };
         };
@@ -702,16 +628,6 @@ in
       };
       memorySearch = lib.mkOption {
         type = t.submodule { options = {
-        cache = lib.mkOption {
-          type = t.submodule { options = {
-          enabled = lib.mkOption {
-            type = t.bool;
-          };
-          maxEntries = lib.mkOption {
-            type = t.int;
-          };
-        }; };
-        };
         chunking = lib.mkOption {
           type = t.submodule { options = {
           overlap = lib.mkOption {
@@ -725,15 +641,8 @@ in
         enabled = lib.mkOption {
           type = t.bool;
         };
-        experimental = lib.mkOption {
-          type = t.submodule { options = {
-          sessionMemory = lib.mkOption {
-            type = t.bool;
-          };
-        }; };
-        };
         fallback = lib.mkOption {
-          type = t.oneOf [ t.enum [ "openai" ] t.enum [ "gemini" ] t.enum [ "local" ] t.enum [ "none" ] ];
+          type = t.oneOf [ t.enum [ "openai" ] t.enum [ "none" ] ];
         };
         local = lib.mkOption {
           type = t.submodule { options = {
@@ -749,26 +658,10 @@ in
           type = t.str;
         };
         provider = lib.mkOption {
-          type = t.oneOf [ t.enum [ "openai" ] t.enum [ "local" ] t.enum [ "gemini" ] ];
+          type = t.oneOf [ t.enum [ "openai" ] t.enum [ "local" ] ];
         };
         query = lib.mkOption {
           type = t.submodule { options = {
-          hybrid = lib.mkOption {
-            type = t.submodule { options = {
-            candidateMultiplier = lib.mkOption {
-              type = t.int;
-            };
-            enabled = lib.mkOption {
-              type = t.bool;
-            };
-            textWeight = lib.mkOption {
-              type = t.number;
-            };
-            vectorWeight = lib.mkOption {
-              type = t.number;
-            };
-          }; };
-          };
           maxResults = lib.mkOption {
             type = t.int;
           };
@@ -785,32 +678,10 @@ in
           baseUrl = lib.mkOption {
             type = t.str;
           };
-          batch = lib.mkOption {
-            type = t.submodule { options = {
-            concurrency = lib.mkOption {
-              type = t.int;
-            };
-            enabled = lib.mkOption {
-              type = t.bool;
-            };
-            pollIntervalMs = lib.mkOption {
-              type = t.int;
-            };
-            timeoutMinutes = lib.mkOption {
-              type = t.int;
-            };
-            wait = lib.mkOption {
-              type = t.bool;
-            };
-          }; };
-          };
           headers = lib.mkOption {
             type = t.attrsOf (t.str);
           };
         }; };
-        };
-        sources = lib.mkOption {
-          type = t.listOf (t.oneOf [ t.enum [ "memory" ] t.enum [ "sessions" ] ]);
         };
         store = lib.mkOption {
           type = t.submodule { options = {
@@ -819,16 +690,6 @@ in
           };
           path = lib.mkOption {
             type = t.str;
-          };
-          vector = lib.mkOption {
-            type = t.submodule { options = {
-            enabled = lib.mkOption {
-              type = t.bool;
-            };
-            extensionPath = lib.mkOption {
-              type = t.str;
-            };
-          }; };
           };
         }; };
         };
@@ -1063,47 +924,6 @@ in
           };
         }; };
         };
-        exec = lib.mkOption {
-          type = t.submodule { options = {
-          applyPatch = lib.mkOption {
-            type = t.submodule { options = {
-            allowModels = lib.mkOption {
-              type = t.listOf (t.str);
-            };
-            enabled = lib.mkOption {
-              type = t.bool;
-            };
-          }; };
-          };
-          ask = lib.mkOption {
-            type = t.enum [ "off" "on-miss" "always" ];
-          };
-          backgroundMs = lib.mkOption {
-            type = t.int;
-          };
-          cleanupMs = lib.mkOption {
-            type = t.int;
-          };
-          host = lib.mkOption {
-            type = t.enum [ "sandbox" "gateway" "node" ];
-          };
-          node = lib.mkOption {
-            type = t.str;
-          };
-          notifyOnExit = lib.mkOption {
-            type = t.bool;
-          };
-          pathPrepend = lib.mkOption {
-            type = t.listOf (t.str);
-          };
-          security = lib.mkOption {
-            type = t.enum [ "deny" "allowlist" "full" ];
-          };
-          timeoutSec = lib.mkOption {
-            type = t.int;
-          };
-        }; };
-        };
         profile = lib.mkOption {
           type = t.oneOf [ t.enum [ "minimal" ] t.enum [ "coding" ] t.enum [ "messaging" ] t.enum [ "full" ] ];
         };
@@ -1217,6 +1037,39 @@ in
   }; });
   };
 
+  bridge = lib.mkOption {
+    type = t.submodule { options = {
+    bind = lib.mkOption {
+      type = t.oneOf [ t.enum [ "auto" ] t.enum [ "lan" ] t.enum [ "tailnet" ] t.enum [ "loopback" ] ];
+    };
+    enabled = lib.mkOption {
+      type = t.bool;
+    };
+    port = lib.mkOption {
+      type = t.int;
+    };
+    tls = lib.mkOption {
+      type = t.submodule { options = {
+      autoGenerate = lib.mkOption {
+        type = t.bool;
+      };
+      caPath = lib.mkOption {
+        type = t.str;
+      };
+      certPath = lib.mkOption {
+        type = t.str;
+      };
+      enabled = lib.mkOption {
+        type = t.bool;
+      };
+      keyPath = lib.mkOption {
+        type = t.str;
+      };
+    }; };
+    };
+  }; };
+  };
+
   broadcast = lib.mkOption {
     type = t.submodule { options = {
     strategy = lib.mkOption {
@@ -1301,214 +1154,6 @@ in
 
   channels = lib.mkOption {
     type = t.submodule { options = {
-    bluebubbles = lib.mkOption {
-      type = t.submodule { options = {
-      accounts = lib.mkOption {
-        type = t.attrsOf (t.submodule { options = {
-        allowFrom = lib.mkOption {
-          type = t.listOf (t.oneOf [ t.str t.number ]);
-        };
-        blockStreaming = lib.mkOption {
-          type = t.bool;
-        };
-        blockStreamingCoalesce = lib.mkOption {
-          type = t.submodule { options = {
-          idleMs = lib.mkOption {
-            type = t.int;
-          };
-          maxChars = lib.mkOption {
-            type = t.int;
-          };
-          minChars = lib.mkOption {
-            type = t.int;
-          };
-        }; };
-        };
-        capabilities = lib.mkOption {
-          type = t.listOf (t.str);
-        };
-        configWrites = lib.mkOption {
-          type = t.bool;
-        };
-        dmHistoryLimit = lib.mkOption {
-          type = t.int;
-        };
-        dmPolicy = lib.mkOption {
-          type = t.enum [ "pairing" "allowlist" "open" "disabled" ];
-        };
-        dms = lib.mkOption {
-          type = t.attrsOf (t.submodule { options = {
-          historyLimit = lib.mkOption {
-            type = t.int;
-          };
-        }; });
-        };
-        enabled = lib.mkOption {
-          type = t.bool;
-        };
-        groupAllowFrom = lib.mkOption {
-          type = t.listOf (t.oneOf [ t.str t.number ]);
-        };
-        groupPolicy = lib.mkOption {
-          type = t.enum [ "open" "disabled" "allowlist" ];
-        };
-        groups = lib.mkOption {
-          type = t.attrsOf (t.submodule { options = {
-          requireMention = lib.mkOption {
-            type = t.bool;
-          };
-        }; });
-        };
-        historyLimit = lib.mkOption {
-          type = t.int;
-        };
-        mediaMaxMb = lib.mkOption {
-          type = t.int;
-        };
-        name = lib.mkOption {
-          type = t.str;
-        };
-        password = lib.mkOption {
-          type = t.str;
-        };
-        sendReadReceipts = lib.mkOption {
-          type = t.bool;
-        };
-        serverUrl = lib.mkOption {
-          type = t.str;
-        };
-        textChunkLimit = lib.mkOption {
-          type = t.int;
-        };
-        webhookPath = lib.mkOption {
-          type = t.str;
-        };
-      }; });
-      };
-      actions = lib.mkOption {
-        type = t.submodule { options = {
-        addParticipant = lib.mkOption {
-          type = t.bool;
-        };
-        edit = lib.mkOption {
-          type = t.bool;
-        };
-        leaveGroup = lib.mkOption {
-          type = t.bool;
-        };
-        reactions = lib.mkOption {
-          type = t.bool;
-        };
-        removeParticipant = lib.mkOption {
-          type = t.bool;
-        };
-        renameGroup = lib.mkOption {
-          type = t.bool;
-        };
-        reply = lib.mkOption {
-          type = t.bool;
-        };
-        sendAttachment = lib.mkOption {
-          type = t.bool;
-        };
-        sendWithEffect = lib.mkOption {
-          type = t.bool;
-        };
-        setGroupIcon = lib.mkOption {
-          type = t.bool;
-        };
-        unsend = lib.mkOption {
-          type = t.bool;
-        };
-      }; };
-      };
-      allowFrom = lib.mkOption {
-        type = t.listOf (t.oneOf [ t.str t.number ]);
-      };
-      blockStreaming = lib.mkOption {
-        type = t.bool;
-      };
-      blockStreamingCoalesce = lib.mkOption {
-        type = t.submodule { options = {
-        idleMs = lib.mkOption {
-          type = t.int;
-        };
-        maxChars = lib.mkOption {
-          type = t.int;
-        };
-        minChars = lib.mkOption {
-          type = t.int;
-        };
-      }; };
-      };
-      capabilities = lib.mkOption {
-        type = t.listOf (t.str);
-      };
-      configWrites = lib.mkOption {
-        type = t.bool;
-      };
-      dmHistoryLimit = lib.mkOption {
-        type = t.int;
-      };
-      dmPolicy = lib.mkOption {
-        type = t.enum [ "pairing" "allowlist" "open" "disabled" ];
-      };
-      dms = lib.mkOption {
-        type = t.attrsOf (t.submodule { options = {
-        historyLimit = lib.mkOption {
-          type = t.int;
-        };
-      }; });
-      };
-      enabled = lib.mkOption {
-        type = t.bool;
-      };
-      groupAllowFrom = lib.mkOption {
-        type = t.listOf (t.oneOf [ t.str t.number ]);
-      };
-      groupPolicy = lib.mkOption {
-        type = t.enum [ "open" "disabled" "allowlist" ];
-      };
-      groups = lib.mkOption {
-        type = t.attrsOf (t.submodule { options = {
-        requireMention = lib.mkOption {
-          type = t.bool;
-        };
-      }; });
-      };
-      historyLimit = lib.mkOption {
-        type = t.int;
-      };
-      mediaMaxMb = lib.mkOption {
-        type = t.int;
-      };
-      name = lib.mkOption {
-        type = t.str;
-      };
-      password = lib.mkOption {
-        type = t.str;
-      };
-      sendReadReceipts = lib.mkOption {
-        type = t.bool;
-      };
-      serverUrl = lib.mkOption {
-        type = t.str;
-      };
-      textChunkLimit = lib.mkOption {
-        type = t.int;
-      };
-      webhookPath = lib.mkOption {
-        type = t.str;
-      };
-    }; };
-    };
-    defaults = lib.mkOption {
-      type = t.submodule { options = {
-      groupPolicy = lib.mkOption {
-        type = t.enum [ "open" "disabled" "allowlist" ];
-      };
-    }; };
-    };
     discord = lib.mkOption {
       type = t.submodule { options = {
       accounts = lib.mkOption {
@@ -2544,9 +2189,6 @@ in
         mediaMaxMb = lib.mkOption {
           type = t.number;
         };
-        mode = lib.mkOption {
-          type = t.enum [ "socket" "http" ];
-        };
         name = lib.mkOption {
           type = t.str;
         };
@@ -2561,9 +2203,6 @@ in
         };
         requireMention = lib.mkOption {
           type = t.bool;
-        };
-        signingSecret = lib.mkOption {
-          type = t.str;
         };
         slashCommand = lib.mkOption {
           type = t.submodule { options = {
@@ -2599,9 +2238,6 @@ in
         };
         userTokenReadOnly = lib.mkOption {
           type = t.bool;
-        };
-        webhookPath = lib.mkOption {
-          type = t.str;
         };
       }; });
       };
@@ -2740,9 +2376,6 @@ in
       mediaMaxMb = lib.mkOption {
         type = t.number;
       };
-      mode = lib.mkOption {
-        type = t.enum [ "socket" "http" ];
-      };
       name = lib.mkOption {
         type = t.str;
       };
@@ -2757,9 +2390,6 @@ in
       };
       requireMention = lib.mkOption {
         type = t.bool;
-      };
-      signingSecret = lib.mkOption {
-        type = t.str;
       };
       slashCommand = lib.mkOption {
         type = t.submodule { options = {
@@ -2795,9 +2425,6 @@ in
       };
       userTokenReadOnly = lib.mkOption {
         type = t.bool;
-      };
-      webhookPath = lib.mkOption {
-        type = t.str;
       };
     }; };
     };
@@ -3450,48 +3077,6 @@ in
   }; };
   };
 
-  diagnostics = lib.mkOption {
-    type = t.submodule { options = {
-    enabled = lib.mkOption {
-      type = t.bool;
-    };
-    otel = lib.mkOption {
-      type = t.submodule { options = {
-      enabled = lib.mkOption {
-        type = t.bool;
-      };
-      endpoint = lib.mkOption {
-        type = t.str;
-      };
-      flushIntervalMs = lib.mkOption {
-        type = t.int;
-      };
-      headers = lib.mkOption {
-        type = t.attrsOf (t.str);
-      };
-      logs = lib.mkOption {
-        type = t.bool;
-      };
-      metrics = lib.mkOption {
-        type = t.bool;
-      };
-      protocol = lib.mkOption {
-        type = t.oneOf [ t.enum [ "http/protobuf" ] t.enum [ "grpc" ] ];
-      };
-      sampleRate = lib.mkOption {
-        type = t.number;
-      };
-      serviceName = lib.mkOption {
-        type = t.str;
-      };
-      traces = lib.mkOption {
-        type = t.bool;
-      };
-    }; };
-    };
-  }; };
-  };
-
   discovery = lib.mkOption {
     type = t.submodule { options = {
     wideArea = lib.mkOption {
@@ -3541,7 +3126,7 @@ in
     }; };
     };
     bind = lib.mkOption {
-      type = t.oneOf [ t.enum [ "auto" ] t.enum [ "lan" ] t.enum [ "loopback" ] t.enum [ "custom" ] ];
+      type = t.oneOf [ t.enum [ "auto" ] t.enum [ "lan" ] t.enum [ "tailnet" ] t.enum [ "loopback" ] ];
     };
     controlUi = lib.mkOption {
       type = t.submodule { options = {
@@ -3564,86 +3149,12 @@ in
           };
         }; };
         };
-        responses = lib.mkOption {
-          type = t.submodule { options = {
-          enabled = lib.mkOption {
-            type = t.bool;
-          };
-          files = lib.mkOption {
-            type = t.submodule { options = {
-            allowUrl = lib.mkOption {
-              type = t.bool;
-            };
-            allowedMimes = lib.mkOption {
-              type = t.listOf (t.str);
-            };
-            maxBytes = lib.mkOption {
-              type = t.int;
-            };
-            maxChars = lib.mkOption {
-              type = t.int;
-            };
-            maxRedirects = lib.mkOption {
-              type = t.int;
-            };
-            pdf = lib.mkOption {
-              type = t.submodule { options = {
-              maxPages = lib.mkOption {
-                type = t.int;
-              };
-              maxPixels = lib.mkOption {
-                type = t.int;
-              };
-              minTextChars = lib.mkOption {
-                type = t.int;
-              };
-            }; };
-            };
-            timeoutMs = lib.mkOption {
-              type = t.int;
-            };
-          }; };
-          };
-          images = lib.mkOption {
-            type = t.submodule { options = {
-            allowUrl = lib.mkOption {
-              type = t.bool;
-            };
-            allowedMimes = lib.mkOption {
-              type = t.listOf (t.str);
-            };
-            maxBytes = lib.mkOption {
-              type = t.int;
-            };
-            maxRedirects = lib.mkOption {
-              type = t.int;
-            };
-            timeoutMs = lib.mkOption {
-              type = t.int;
-            };
-          }; };
-          };
-          maxBodyBytes = lib.mkOption {
-            type = t.int;
-          };
-        }; };
-        };
       }; };
       };
     }; };
     };
     mode = lib.mkOption {
       type = t.oneOf [ t.enum [ "local" ] t.enum [ "remote" ] ];
-    };
-    nodes = lib.mkOption {
-      type = t.submodule { options = {
-      allowCommands = lib.mkOption {
-        type = t.listOf (t.str);
-      };
-      denyCommands = lib.mkOption {
-        type = t.listOf (t.str);
-      };
-    }; };
     };
     port = lib.mkOption {
       type = t.int;
@@ -3669,9 +3180,6 @@ in
       sshTarget = lib.mkOption {
         type = t.str;
       };
-      tlsFingerprint = lib.mkOption {
-        type = t.str;
-      };
       token = lib.mkOption {
         type = t.str;
       };
@@ -3687,25 +3195,6 @@ in
       };
       resetOnExit = lib.mkOption {
         type = t.bool;
-      };
-    }; };
-    };
-    tls = lib.mkOption {
-      type = t.submodule { options = {
-      autoGenerate = lib.mkOption {
-        type = t.bool;
-      };
-      caPath = lib.mkOption {
-        type = t.str;
-      };
-      certPath = lib.mkOption {
-        type = t.str;
-      };
-      enabled = lib.mkOption {
-        type = t.bool;
-      };
-      keyPath = lib.mkOption {
-        type = t.str;
       };
     }; };
     };
@@ -4055,17 +3544,6 @@ in
   }; };
   };
 
-  meta = lib.mkOption {
-    type = t.submodule { options = {
-    lastTouchedAt = lib.mkOption {
-      type = t.str;
-    };
-    lastTouchedVersion = lib.mkOption {
-      type = t.str;
-    };
-  }; };
-  };
-
   models = lib.mkOption {
     type = t.submodule { options = {
     mode = lib.mkOption {
@@ -4074,13 +3552,10 @@ in
     providers = lib.mkOption {
       type = t.attrsOf (t.submodule { options = {
       api = lib.mkOption {
-        type = t.oneOf [ t.enum [ "openai-completions" ] t.enum [ "openai-responses" ] t.enum [ "anthropic-messages" ] t.enum [ "google-generative-ai" ] t.enum [ "github-copilot" ] t.enum [ "bedrock-converse-stream" ] ];
+        type = t.oneOf [ t.enum [ "openai-completions" ] t.enum [ "openai-responses" ] t.enum [ "anthropic-messages" ] t.enum [ "google-generative-ai" ] t.enum [ "github-copilot" ] ];
       };
       apiKey = lib.mkOption {
         type = t.str;
-      };
-      auth = lib.mkOption {
-        type = t.oneOf [ t.enum [ "api-key" ] t.enum [ "aws-sdk" ] t.enum [ "oauth" ] t.enum [ "token" ] ];
       };
       authHeader = lib.mkOption {
         type = t.bool;
@@ -4094,7 +3569,7 @@ in
       models = lib.mkOption {
         type = t.listOf (t.submodule { options = {
         api = lib.mkOption {
-          type = t.oneOf [ t.enum [ "openai-completions" ] t.enum [ "openai-responses" ] t.enum [ "anthropic-messages" ] t.enum [ "google-generative-ai" ] t.enum [ "github-copilot" ] t.enum [ "bedrock-converse-stream" ] ];
+          type = t.oneOf [ t.enum [ "openai-completions" ] t.enum [ "openai-responses" ] t.enum [ "anthropic-messages" ] t.enum [ "google-generative-ai" ] t.enum [ "github-copilot" ] ];
         };
         compat = lib.mkOption {
           type = t.submodule { options = {
@@ -4206,13 +3681,6 @@ in
       };
     }; };
     };
-    slots = lib.mkOption {
-      type = t.submodule { options = {
-      memory = lib.mkOption {
-        type = t.str;
-      };
-    }; };
-    };
   }; };
   };
 
@@ -4239,62 +3707,6 @@ in
     };
     mainKey = lib.mkOption {
       type = t.str;
-    };
-    reset = lib.mkOption {
-      type = t.submodule { options = {
-      atHour = lib.mkOption {
-        type = t.int;
-      };
-      idleMinutes = lib.mkOption {
-        type = t.int;
-      };
-      mode = lib.mkOption {
-        type = t.oneOf [ t.enum [ "daily" ] t.enum [ "idle" ] ];
-      };
-    }; };
-    };
-    resetByType = lib.mkOption {
-      type = t.submodule { options = {
-      dm = lib.mkOption {
-        type = t.submodule { options = {
-        atHour = lib.mkOption {
-          type = t.int;
-        };
-        idleMinutes = lib.mkOption {
-          type = t.int;
-        };
-        mode = lib.mkOption {
-          type = t.oneOf [ t.enum [ "daily" ] t.enum [ "idle" ] ];
-        };
-      }; };
-      };
-      group = lib.mkOption {
-        type = t.submodule { options = {
-        atHour = lib.mkOption {
-          type = t.int;
-        };
-        idleMinutes = lib.mkOption {
-          type = t.int;
-        };
-        mode = lib.mkOption {
-          type = t.oneOf [ t.enum [ "daily" ] t.enum [ "idle" ] ];
-        };
-      }; };
-      };
-      thread = lib.mkOption {
-        type = t.submodule { options = {
-        atHour = lib.mkOption {
-          type = t.int;
-        };
-        idleMinutes = lib.mkOption {
-          type = t.int;
-        };
-        mode = lib.mkOption {
-          type = t.oneOf [ t.enum [ "daily" ] t.enum [ "idle" ] ];
-        };
-      }; };
-      };
-    }; };
     };
     resetTriggers = lib.mkOption {
       type = t.listOf (t.str);
@@ -4350,9 +3762,6 @@ in
       type = t.attrsOf (t.submodule { options = {
       apiKey = lib.mkOption {
         type = t.str;
-      };
-      config = lib.mkOption {
-        type = t.attrsOf (t.anything);
       };
       enabled = lib.mkOption {
         type = t.bool;
@@ -4464,29 +3873,14 @@ in
         };
       }; };
       };
-      ask = lib.mkOption {
-        type = t.enum [ "off" "on-miss" "always" ];
-      };
       backgroundMs = lib.mkOption {
         type = t.int;
       };
       cleanupMs = lib.mkOption {
         type = t.int;
       };
-      host = lib.mkOption {
-        type = t.enum [ "sandbox" "gateway" "node" ];
-      };
-      node = lib.mkOption {
-        type = t.str;
-      };
       notifyOnExit = lib.mkOption {
         type = t.bool;
-      };
-      pathPrepend = lib.mkOption {
-        type = t.listOf (t.str);
-      };
-      security = lib.mkOption {
-        type = t.enum [ "deny" "allowlist" "full" ];
       };
       timeoutSec = lib.mkOption {
         type = t.int;
@@ -5115,21 +4509,8 @@ in
         maxResults = lib.mkOption {
           type = t.int;
         };
-        perplexity = lib.mkOption {
-          type = t.submodule { options = {
-          apiKey = lib.mkOption {
-            type = t.str;
-          };
-          baseUrl = lib.mkOption {
-            type = t.str;
-          };
-          model = lib.mkOption {
-            type = t.str;
-          };
-        }; };
-        };
         provider = lib.mkOption {
-          type = t.oneOf [ t.enum [ "brave" ] t.enum [ "perplexity" ] ];
+          type = t.oneOf [ t.enum [ "brave" ] ];
         };
         timeoutSeconds = lib.mkOption {
           type = t.int;
@@ -5152,7 +4533,7 @@ in
   update = lib.mkOption {
     type = t.submodule { options = {
     channel = lib.mkOption {
-      type = t.oneOf [ t.enum [ "stable" ] t.enum [ "beta" ] t.enum [ "dev" ] ];
+      type = t.oneOf [ t.enum [ "stable" ] t.enum [ "beta" ] ];
     };
     checkOnStart = lib.mkOption {
       type = t.bool;
