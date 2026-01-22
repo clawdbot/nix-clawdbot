@@ -158,7 +158,7 @@ in
           type = t.int;
         };
         mode = lib.mkOption {
-          type = t.oneOf [ t.enum [ "off" ] t.enum [ "adaptive" ] t.enum [ "aggressive" ] ];
+          type = t.oneOf [ t.enum [ "off" ] t.enum [ "cache-ttl" ] ];
         };
         softTrim = lib.mkOption {
           type = t.submodule { options = {
@@ -186,6 +186,9 @@ in
           };
         }; };
         };
+        ttl = lib.mkOption {
+          type = t.str;
+        };
       }; };
       };
       contextTokens = lib.mkOption {
@@ -207,6 +210,19 @@ in
         type = t.submodule { options = {
         ackMaxChars = lib.mkOption {
           type = t.int;
+        };
+        activeHours = lib.mkOption {
+          type = t.submodule { options = {
+          end = lib.mkOption {
+            type = t.str;
+          };
+          start = lib.mkOption {
+            type = t.str;
+          };
+          timezone = lib.mkOption {
+            type = t.str;
+          };
+        }; };
         };
         every = lib.mkOption {
           type = t.str;
@@ -661,6 +677,19 @@ in
         ackMaxChars = lib.mkOption {
           type = t.int;
         };
+        activeHours = lib.mkOption {
+          type = t.submodule { options = {
+          end = lib.mkOption {
+            type = t.str;
+          };
+          start = lib.mkOption {
+            type = t.str;
+          };
+          timezone = lib.mkOption {
+            type = t.str;
+          };
+        }; };
+        };
         every = lib.mkOption {
           type = t.str;
         };
@@ -1114,6 +1143,9 @@ in
             type = t.bool;
           };
           pathPrepend = lib.mkOption {
+            type = t.listOf (t.str);
+          };
+          safeBins = lib.mkOption {
             type = t.listOf (t.str);
           };
           security = lib.mkOption {
@@ -3587,10 +3619,13 @@ in
     }; };
     };
     bind = lib.mkOption {
-      type = t.oneOf [ t.enum [ "auto" ] t.enum [ "lan" ] t.enum [ "loopback" ] t.enum [ "custom" ] ];
+      type = t.oneOf [ t.enum [ "auto" ] t.enum [ "lan" ] t.enum [ "loopback" ] t.enum [ "custom" ] t.enum [ "tailnet" ] ];
     };
     controlUi = lib.mkOption {
       type = t.submodule { options = {
+      allowInsecureAuth = lib.mkOption {
+        type = t.bool;
+      };
       basePath = lib.mkOption {
         type = t.str;
       };
@@ -4013,32 +4048,7 @@ in
     inbound = lib.mkOption {
       type = t.submodule { options = {
       byChannel = lib.mkOption {
-        type = t.submodule { options = {
-        discord = lib.mkOption {
-          type = t.int;
-        };
-        imessage = lib.mkOption {
-          type = t.int;
-        };
-        msteams = lib.mkOption {
-          type = t.int;
-        };
-        signal = lib.mkOption {
-          type = t.int;
-        };
-        slack = lib.mkOption {
-          type = t.int;
-        };
-        telegram = lib.mkOption {
-          type = t.int;
-        };
-        webchat = lib.mkOption {
-          type = t.int;
-        };
-        whatsapp = lib.mkOption {
-          type = t.int;
-        };
-      }; };
+        type = t.attrsOf (t.int);
       };
       debounceMs = lib.mkOption {
         type = t.int;
@@ -4083,6 +4093,9 @@ in
       };
       debounceMs = lib.mkOption {
         type = t.int;
+      };
+      debounceMsByChannel = lib.mkOption {
+        type = t.attrsOf (t.int);
       };
       drop = lib.mkOption {
         type = t.oneOf [ t.enum [ "old" ] t.enum [ "new" ] t.enum [ "summarize" ] ];
@@ -4274,9 +4287,6 @@ in
     dmScope = lib.mkOption {
       type = t.oneOf [ t.enum [ "main" ] t.enum [ "per-peer" ] t.enum [ "per-channel-peer" ] ];
     };
-    heartbeatIdleMinutes = lib.mkOption {
-      type = t.int;
-    };
     identityLinks = lib.mkOption {
       type = t.attrsOf (t.listOf (t.str));
     };
@@ -4298,6 +4308,19 @@ in
         type = t.oneOf [ t.enum [ "daily" ] t.enum [ "idle" ] ];
       };
     }; };
+    };
+    resetByChannel = lib.mkOption {
+      type = t.attrsOf (t.submodule { options = {
+      atHour = lib.mkOption {
+        type = t.int;
+      };
+      idleMinutes = lib.mkOption {
+        type = t.int;
+      };
+      mode = lib.mkOption {
+        type = t.oneOf [ t.enum [ "daily" ] t.enum [ "idle" ] ];
+      };
+    }; });
     };
     resetByType = lib.mkOption {
       type = t.submodule { options = {
@@ -4529,6 +4552,9 @@ in
         type = t.bool;
       };
       pathPrepend = lib.mkOption {
+        type = t.listOf (t.str);
+      };
+      safeBins = lib.mkOption {
         type = t.listOf (t.str);
       };
       security = lib.mkOption {
