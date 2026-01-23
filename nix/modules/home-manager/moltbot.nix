@@ -1175,13 +1175,12 @@ in {
     );
 
     home.activation.moltbotDirs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      /bin/mkdir -p ${lib.concatStringsSep " " (lib.concatMap (item: item.dirs) instanceConfigs)}
-      ${lib.optionalString (pluginStateDirsAll != []) "/bin/mkdir -p ${lib.concatStringsSep " " pluginStateDirsAll}"}
+      run mkdir -p ${lib.concatStringsSep " " (lib.concatMap (item: item.dirs) instanceConfigs)}
+      ${lib.optionalString (pluginStateDirsAll != []) "run mkdir -p ${lib.concatStringsSep " " pluginStateDirsAll}"}
     '';
 
     home.activation.moltbotConfigFiles = lib.hm.dag.entryAfter [ "moltbotDirs" ] ''
-      set -euo pipefail
-      ${lib.concatStringsSep "\n" (map (item: "/bin/ln -sfn ${item.configFile} ${item.configPath}") instanceConfigs)}
+      ${lib.concatStringsSep "\n" (map (item: "run ln -sfn ${item.configFile} ${item.configPath}") instanceConfigs)}
     '';
 
     home.activation.moltbotPluginGuard = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
