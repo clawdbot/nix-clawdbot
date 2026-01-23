@@ -4,6 +4,10 @@ mkdir -p "$out/lib/moltbot" "$out/bin"
 
 # Copy core files and bundled extensions (memory-core, etc.)
 cp -r dist node_modules package.json ui "$out/lib/moltbot/"
+# Copy docs (includes workspace templates like AGENTS.md)
+if [ -d "docs" ]; then
+  cp -r docs "$out/lib/moltbot/"
+fi
 if [ -d "extensions" ]; then
   cp -r extensions "$out/lib/moltbot/"
 fi
