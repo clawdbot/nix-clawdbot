@@ -59,6 +59,17 @@ let
     };
   };
 
+  mkAuthConfig = inst: lib.optionalAttrs (inst.providers.anthropic.apiKeyFile != "") {
+    auth = {
+      profiles = {
+        "anthropic:default" = {
+          provider = "anthropic";
+          mode = "api_key";
+        };
+      };
+    };
+  };
+
   firstPartySources = let
     stepieteRev = "e4e2cac265de35175015cf1ae836b0b30dddd7b7";
     stepieteNarHash = "sha256-L8bKt5rK78dFP3ZoP1Oi1SSAforXVHZDsSiDO+NsvEE=";
@@ -735,9 +746,13 @@ let
     pluginPackages = pluginPackagesFor name;
     pluginEnvAll = pluginEnvAllFor name;
     baseConfig = mkBaseConfig inst.workspaceDir inst;
-    mergedConfig = lib.recursiveUpdate
-      (lib.recursiveUpdate baseConfig (lib.recursiveUpdate (mkTelegramConfig inst) (mkRoutingConfig inst)))
-      inst.configOverrides;
+    mergedConfig = lib.foldl' lib.recursiveUpdate {} [
+      baseConfig
+      (mkTelegramConfig inst)
+      (mkRoutingConfig inst)
+      (mkAuthConfig inst)
+      inst.configOverrides
+    ];
     configJson = builtins.toJSON mergedConfig;
     configFile = pkgs.writeText "clawdbot-${name}.json" configJson;
     gatewayWrapper = pkgs.writeShellScriptBin "clawdbot-gateway-${name}" ''
