@@ -36,11 +36,13 @@ let
   };
 
   mkTelegramConfig = inst: lib.optionalAttrs inst.providers.telegram.enable {
-    telegram = {
-      enabled = true;
-      tokenFile = inst.providers.telegram.botTokenFile;
-      allowFrom = inst.providers.telegram.allowFrom;
-      groups = inst.providers.telegram.groups;
+    channels = {
+      telegram = {
+        enabled = true;
+        tokenFile = inst.providers.telegram.botTokenFile;
+        allowFrom = inst.providers.telegram.allowFrom;
+        groups = inst.providers.telegram.groups;
+      };
     };
   };
 
