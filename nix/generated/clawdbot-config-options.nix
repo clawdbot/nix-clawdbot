@@ -4472,6 +4472,9 @@ in
     enabled = lib.mkOption {
       type = t.bool;
     };
+    flags = lib.mkOption {
+      type = t.listOf (t.str);
+    };
     otel = lib.mkOption {
       type = t.submodule { options = {
       enabled = lib.mkOption {
