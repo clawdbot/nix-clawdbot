@@ -3832,6 +3832,9 @@ in
         historyLimit = lib.mkOption {
           type = t.int;
         };
+        linkPreview = lib.mkOption {
+          type = t.bool;
+        };
         markdown = lib.mkOption {
           type = t.submodule { options = {
           tables = lib.mkOption {
@@ -4062,6 +4065,9 @@ in
       };
       historyLimit = lib.mkOption {
         type = t.int;
+      };
+      linkPreview = lib.mkOption {
+        type = t.bool;
       };
       markdown = lib.mkOption {
         type = t.submodule { options = {
