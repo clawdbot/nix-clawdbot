@@ -262,7 +262,9 @@ in {
         ];
 
         # Hardening options
-        ProtectHome = true;
+        # ProtectHome disabled when OAuth credentials are in /home
+        # (BindPaths can't access /home when ProtectHome=true)
+        ProtectHome = !instCfg.hasOauth;
         ProtectSystem = "strict";
         PrivateTmp = true;
         PrivateDevices = true;
