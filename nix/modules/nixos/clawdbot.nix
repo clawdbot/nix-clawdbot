@@ -72,7 +72,10 @@ let
 
   # Config generation helpers (mirrored from home-manager)
   mkBaseConfig = workspaceDir: inst: {
-    gateway = { mode = "local"; };
+    gateway = {
+      mode = "local";
+      auth.mode = "none";  # System service, not exposed externally
+    };
     agents = {
       defaults = {
         workspace = workspaceDir;
