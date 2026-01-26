@@ -289,7 +289,7 @@ in {
           "CLAWDBOT_CONFIG_PATH=${instCfg.configPath}"
           "CLAWDBOT_STATE_DIR=${instCfg.stateDir}"
           "CLAWDBOT_NIX_MODE=1"
-          # Backward-compatible env names
+          # Backward-compatible env names (gateway still uses CLAWDIS_* in some builds)
           "CLAWDIS_CONFIG_PATH=${instCfg.configPath}"
           "CLAWDIS_STATE_DIR=${instCfg.stateDir}"
           "CLAWDIS_NIX_MODE=1"
