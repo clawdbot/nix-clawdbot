@@ -252,7 +252,8 @@ in {
         AmbientCapabilities = "";
 
         # Network restrictions (gateway needs network)
-        RestrictAddressFamilies = [ "AF_INET" "AF_INET6" "AF_UNIX" ];
+        # AF_NETLINK required for os.networkInterfaces() in Node.js
+        RestrictAddressFamilies = [ "AF_INET" "AF_INET6" "AF_UNIX" "AF_NETLINK" ];
         IPAddressDeny = "multicast";
 
         # System call filtering
