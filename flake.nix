@@ -55,6 +55,10 @@
           config-options = pkgs.callPackage ./nix/checks/moltbot-config-options.nix {
             sourceInfo = sourceInfoStable;
           };
+          nixos-module = import ./nix/checks/nixos-module-test.nix {
+            inherit pkgs;
+            clawdbotModule = self.nixosModules.clawdbot;
+          };
         } else {});
 
         devShells.default = pkgs.mkShell {
