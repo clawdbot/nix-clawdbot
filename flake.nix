@@ -69,5 +69,6 @@
       overlays.default = overlay;
       homeManagerModules.moltbot = import ./nix/modules/home-manager/moltbot.nix;
       darwinModules.moltbot = import ./nix/modules/darwin/moltbot.nix;
+      nixosModules.moltbot = import ./nix/modules/nixos/moltbot.nix;
     };
 }
