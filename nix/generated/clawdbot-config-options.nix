@@ -1098,9 +1098,15 @@ in
         allow = lib.mkOption {
           type = t.listOf (t.str);
         };
+        alsoAllow = lib.mkOption {
+          type = t.listOf (t.str);
+        };
         byProvider = lib.mkOption {
           type = t.attrsOf (t.submodule { options = {
           allow = lib.mkOption {
+            type = t.listOf (t.str);
+          };
+          alsoAllow = lib.mkOption {
             type = t.listOf (t.str);
           };
           deny = lib.mkOption {
@@ -1179,6 +1185,9 @@ in
           tools = lib.mkOption {
             type = t.submodule { options = {
             allow = lib.mkOption {
+              type = t.listOf (t.str);
+            };
+            alsoAllow = lib.mkOption {
               type = t.listOf (t.str);
             };
             deny = lib.mkOption {
@@ -1476,6 +1485,9 @@ in
             allow = lib.mkOption {
               type = t.listOf (t.str);
             };
+            alsoAllow = lib.mkOption {
+              type = t.listOf (t.str);
+            };
             deny = lib.mkOption {
               type = t.listOf (t.str);
             };
@@ -1624,6 +1636,9 @@ in
         tools = lib.mkOption {
           type = t.submodule { options = {
           allow = lib.mkOption {
+            type = t.listOf (t.str);
+          };
+          alsoAllow = lib.mkOption {
             type = t.listOf (t.str);
           };
           deny = lib.mkOption {
@@ -1877,6 +1892,9 @@ in
               allow = lib.mkOption {
                 type = t.listOf (t.str);
               };
+              alsoAllow = lib.mkOption {
+                type = t.listOf (t.str);
+              };
               deny = lib.mkOption {
                 type = t.listOf (t.str);
               };
@@ -1899,6 +1917,9 @@ in
           tools = lib.mkOption {
             type = t.submodule { options = {
             allow = lib.mkOption {
+              type = t.listOf (t.str);
+            };
+            alsoAllow = lib.mkOption {
               type = t.listOf (t.str);
             };
             deny = lib.mkOption {
@@ -2154,6 +2175,9 @@ in
             allow = lib.mkOption {
               type = t.listOf (t.str);
             };
+            alsoAllow = lib.mkOption {
+              type = t.listOf (t.str);
+            };
             deny = lib.mkOption {
               type = t.listOf (t.str);
             };
@@ -2176,6 +2200,9 @@ in
         tools = lib.mkOption {
           type = t.submodule { options = {
           allow = lib.mkOption {
+            type = t.listOf (t.str);
+          };
+          alsoAllow = lib.mkOption {
             type = t.listOf (t.str);
           };
           deny = lib.mkOption {
@@ -2594,6 +2621,9 @@ in
             allow = lib.mkOption {
               type = t.listOf (t.str);
             };
+            alsoAllow = lib.mkOption {
+              type = t.listOf (t.str);
+            };
             deny = lib.mkOption {
               type = t.listOf (t.str);
             };
@@ -2711,6 +2741,9 @@ in
         tools = lib.mkOption {
           type = t.submodule { options = {
           allow = lib.mkOption {
+            type = t.listOf (t.str);
+          };
+          alsoAllow = lib.mkOption {
             type = t.listOf (t.str);
           };
           deny = lib.mkOption {
@@ -2874,6 +2907,9 @@ in
             allow = lib.mkOption {
               type = t.listOf (t.str);
             };
+            alsoAllow = lib.mkOption {
+              type = t.listOf (t.str);
+            };
             deny = lib.mkOption {
               type = t.listOf (t.str);
             };
@@ -2890,6 +2926,9 @@ in
         tools = lib.mkOption {
           type = t.submodule { options = {
           allow = lib.mkOption {
+            type = t.listOf (t.str);
+          };
+          alsoAllow = lib.mkOption {
             type = t.listOf (t.str);
           };
           deny = lib.mkOption {
@@ -3272,6 +3311,9 @@ in
             allow = lib.mkOption {
               type = t.listOf (t.str);
             };
+            alsoAllow = lib.mkOption {
+              type = t.listOf (t.str);
+            };
             deny = lib.mkOption {
               type = t.listOf (t.str);
             };
@@ -3515,6 +3557,9 @@ in
         tools = lib.mkOption {
           type = t.submodule { options = {
           allow = lib.mkOption {
+            type = t.listOf (t.str);
+          };
+          alsoAllow = lib.mkOption {
             type = t.listOf (t.str);
           };
           deny = lib.mkOption {
@@ -3810,6 +3855,9 @@ in
             allow = lib.mkOption {
               type = t.listOf (t.str);
             };
+            alsoAllow = lib.mkOption {
+              type = t.listOf (t.str);
+            };
             deny = lib.mkOption {
               type = t.listOf (t.str);
             };
@@ -4044,6 +4092,9 @@ in
           allow = lib.mkOption {
             type = t.listOf (t.str);
           };
+          alsoAllow = lib.mkOption {
+            type = t.listOf (t.str);
+          };
           deny = lib.mkOption {
             type = t.listOf (t.str);
           };
@@ -4236,6 +4287,9 @@ in
             allow = lib.mkOption {
               type = t.listOf (t.str);
             };
+            alsoAllow = lib.mkOption {
+              type = t.listOf (t.str);
+            };
             deny = lib.mkOption {
               type = t.listOf (t.str);
             };
@@ -4370,6 +4424,9 @@ in
         tools = lib.mkOption {
           type = t.submodule { options = {
           allow = lib.mkOption {
+            type = t.listOf (t.str);
+          };
+          alsoAllow = lib.mkOption {
             type = t.listOf (t.str);
           };
           deny = lib.mkOption {
@@ -5684,9 +5741,15 @@ in
     allow = lib.mkOption {
       type = t.listOf (t.str);
     };
+    alsoAllow = lib.mkOption {
+      type = t.listOf (t.str);
+    };
     byProvider = lib.mkOption {
       type = t.attrsOf (t.submodule { options = {
       allow = lib.mkOption {
+        type = t.listOf (t.str);
+      };
+      alsoAllow = lib.mkOption {
         type = t.listOf (t.str);
       };
       deny = lib.mkOption {
@@ -6376,6 +6439,9 @@ in
         allow = lib.mkOption {
           type = t.listOf (t.str);
         };
+        alsoAllow = lib.mkOption {
+          type = t.listOf (t.str);
+        };
         deny = lib.mkOption {
           type = t.listOf (t.str);
         };
@@ -6388,6 +6454,9 @@ in
       tools = lib.mkOption {
         type = t.submodule { options = {
         allow = lib.mkOption {
+          type = t.listOf (t.str);
+        };
+        alsoAllow = lib.mkOption {
           type = t.listOf (t.str);
         };
         deny = lib.mkOption {
