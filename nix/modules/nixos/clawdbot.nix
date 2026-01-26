@@ -38,11 +38,9 @@ let
     then (pkgs.clawdbotPackages.withTools toolOverrides).clawdbot
     else cfg.package;
 
-  generatedConfigOptions = import ../../generated/clawdbot-config-options.nix { inherit lib; };
-
   # Import option definitions
   optionsDef = import ./options.nix {
-    inherit lib cfg defaultPackage generatedConfigOptions;
+    inherit lib cfg defaultPackage;
   };
 
   # Default instance when no explicit instances are defined
@@ -58,7 +56,6 @@ let
     gateway = cfg.gateway;
     plugins = cfg.plugins;
     configOverrides = {};
-    config = {};
     agent = {
       model = cfg.defaults.model;
       thinkingDefault = cfg.defaults.thinkingDefault;

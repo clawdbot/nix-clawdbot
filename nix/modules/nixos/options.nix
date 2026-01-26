@@ -12,7 +12,7 @@
 # - Removes: launchd.*, app.*, appDefaults.* (macOS-specific)
 # - systemd options are for system services (not user services)
 
-{ lib, cfg, defaultPackage, generatedConfigOptions }:
+{ lib, cfg, defaultPackage }:
 
 let
   stateDir = "/var/lib/clawdbot";
@@ -183,12 +183,6 @@ let
         type = lib.types.attrs;
         default = {};
         description = "Additional config to merge into generated JSON.";
-      };
-
-      config = lib.mkOption {
-        type = lib.types.submodule { options = generatedConfigOptions; };
-        default = {};
-        description = "Upstream Clawdbot config (generated from schema).";
       };
     };
   };

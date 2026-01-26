@@ -308,7 +308,6 @@ let
     systemd = cfg.systemd;
     plugins = cfg.plugins;
     configOverrides = {};
-    config = {};
     agent = {
       model = cfg.defaults.model;
       thinkingDefault = cfg.defaults.thinkingDefault;
