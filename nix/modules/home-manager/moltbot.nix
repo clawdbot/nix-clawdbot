@@ -987,8 +987,8 @@ in {
     defaults = {
       model = lib.mkOption {
         type = lib.types.str;
-        default = "anthropic/claude-opus-4-5";
-        description = "Default model for all instances (provider/model). Slower and more expensive than smaller models.";
+        default = "anthropic/claude-sonnet-4-20250514";
+        description = "Default model for all instances (provider/model).";
       };
       thinkingDefault = lib.mkOption {
         type = lib.types.enum [ "off" "minimal" "low" "medium" "high" ];
