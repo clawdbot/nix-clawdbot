@@ -55,6 +55,7 @@ let
     gatewayPort = 18789;
     providers = cfg.providers;
     routing = cfg.routing;
+    gateway = cfg.gateway;
     plugins = cfg.plugins;
     configOverrides = {};
     config = {};
@@ -120,6 +121,11 @@ let
       configJson = builtins.toJSON mergedConfig;
       configFile = pkgs.writeText "clawdbot-${name}.json" configJson;
 
+      # Gateway auth configuration
+      gatewayAuthMode = inst.gateway.auth.mode;
+      gatewayTokenFile = inst.gateway.auth.tokenFile or null;
+      gatewayPasswordFile = inst.gateway.auth.passwordFile or null;
+
       # Gateway wrapper script that loads credentials at runtime
       gatewayWrapper = pkgs.writeShellScriptBin "clawdbot-gateway-${name}" ''
         set -euo pipefail
@@ -133,6 +139,36 @@ let
           fi
           export ANTHROPIC_API_KEY
         fi
+
+        # Load gateway token if configured
+        ${lib.optionalString (gatewayTokenFile != null) ''
+        if [ -f "${gatewayTokenFile}" ]; then
+          CLAWDBOT_GATEWAY_TOKEN="$(cat "${gatewayTokenFile}")"
+          if [ -z "$CLAWDBOT_GATEWAY_TOKEN" ]; then
+            echo "Gateway token file is empty: ${gatewayTokenFile}" >&2
+            exit 1
+          fi
+          export CLAWDBOT_GATEWAY_TOKEN
+        else
+          echo "Gateway token file not found: ${gatewayTokenFile}" >&2
+          exit 1
+        fi
+        ''}
+
+        # Load gateway password if configured
+        ${lib.optionalString (gatewayPasswordFile != null) ''
+        if [ -f "${gatewayPasswordFile}" ]; then
+          CLAWDBOT_GATEWAY_PASSWORD="$(cat "${gatewayPasswordFile}")"
+          if [ -z "$CLAWDBOT_GATEWAY_PASSWORD" ]; then
+            echo "Gateway password file is empty: ${gatewayPasswordFile}" >&2
+            exit 1
+          fi
+          export CLAWDBOT_GATEWAY_PASSWORD
+        else
+          echo "Gateway password file not found: ${gatewayPasswordFile}" >&2
+          exit 1
+        fi
+        ''}
 
         exec "${gatewayPackage}/bin/clawdbot" "$@"
       '';

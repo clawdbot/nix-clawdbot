@@ -152,6 +152,34 @@ let
         };
       };
 
+      gateway.auth = {
+        mode = lib.mkOption {
+          type = lib.types.enum [ "token" "password" ];
+          default = cfg.gateway.auth.mode;
+          description = "Gateway authentication mode.";
+        };
+
+        tokenFile = lib.mkOption {
+          type = lib.types.nullOr lib.types.str;
+          default = cfg.gateway.auth.tokenFile;
+          description = ''
+            Path to file containing the gateway authentication token.
+            Required when auth mode is "token".
+          '';
+          example = "/run/agenix/clawdbot-gateway-token";
+        };
+
+        passwordFile = lib.mkOption {
+          type = lib.types.nullOr lib.types.str;
+          default = cfg.gateway.auth.passwordFile;
+          description = ''
+            Path to file containing the gateway authentication password.
+            Required when auth mode is "password".
+          '';
+          example = "/run/agenix/clawdbot-gateway-password";
+        };
+      };
+
       configOverrides = lib.mkOption {
         type = lib.types.attrs;
         default = {};
@@ -349,6 +377,34 @@ in {
           webchat = "queue";
         };
         description = "Per-channel queue mode overrides.";
+      };
+    };
+
+    gateway.auth = {
+      mode = lib.mkOption {
+        type = lib.types.enum [ "token" "password" ];
+        default = "token";
+        description = "Gateway authentication mode.";
+      };
+
+      tokenFile = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = ''
+          Path to file containing the gateway authentication token.
+          Required when auth mode is "token".
+        '';
+        example = "/run/agenix/clawdbot-gateway-token";
+      };
+
+      passwordFile = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = ''
+          Path to file containing the gateway authentication password.
+          Required when auth mode is "password".
+        '';
+        example = "/run/agenix/clawdbot-gateway-password";
       };
     };
 
