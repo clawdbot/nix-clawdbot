@@ -2,7 +2,7 @@
 set -e
 mkdir -p "$out/lib/clawdbot" "$out/bin"
 
-cp -r dist node_modules package.json ui "$out/lib/clawdbot/"
+cp -r dist node_modules package.json ui extensions docs "$out/lib/clawdbot/"
 
 if [ -z "${STDENV_SETUP:-}" ]; then
   echo "STDENV_SETUP is not set" >&2

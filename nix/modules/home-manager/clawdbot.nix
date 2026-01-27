@@ -33,14 +33,20 @@ let
         }
       ];
     };
+  } // lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
+    # Disable memory slot on Linux - memory-core plugin not available for headless servers
+    # See: https://github.com/clawdbot/clawdbot/blob/main/docs/concepts/memory.md
+    plugins.slots.memory = "none";
   };
 
   mkTelegramConfig = inst: lib.optionalAttrs inst.providers.telegram.enable {
-    telegram = {
-      enabled = true;
-      tokenFile = inst.providers.telegram.botTokenFile;
-      allowFrom = inst.providers.telegram.allowFrom;
-      groups = inst.providers.telegram.groups;
+    channels = {
+      telegram = {
+        enabled = true;
+        tokenFile = inst.providers.telegram.botTokenFile;
+        allowFrom = inst.providers.telegram.allowFrom;
+        groups = inst.providers.telegram.groups;
+      };
     };
   };
 
@@ -48,7 +54,18 @@ let
     messages = {
       queue = {
         mode = inst.routing.queue.mode;
-        byProvider = inst.routing.queue.byProvider;
+        byChannel = inst.routing.queue.byProvider;
+      };
+    };
+  };
+
+  mkAuthConfig = inst: lib.optionalAttrs (inst.providers.anthropic.apiKeyFile != "") {
+    auth = {
+      profiles = {
+        "anthropic:default" = {
+          provider = "anthropic";
+          mode = "api_key";
+        };
       };
     };
   };
@@ -729,9 +746,13 @@ let
     pluginPackages = pluginPackagesFor name;
     pluginEnvAll = pluginEnvAllFor name;
     baseConfig = mkBaseConfig inst.workspaceDir inst;
-    mergedConfig = lib.recursiveUpdate
-      (lib.recursiveUpdate baseConfig (lib.recursiveUpdate (mkTelegramConfig inst) (mkRoutingConfig inst)))
-      inst.configOverrides;
+    mergedConfig = lib.foldl' lib.recursiveUpdate {} [
+      baseConfig
+      (mkTelegramConfig inst)
+      (mkRoutingConfig inst)
+      (mkAuthConfig inst)
+      inst.configOverrides
+    ];
     configJson = builtins.toJSON mergedConfig;
     configFile = pkgs.writeText "clawdbot-${name}.json" configJson;
     gatewayWrapper = pkgs.writeShellScriptBin "clawdbot-gateway-${name}" ''
@@ -876,6 +897,18 @@ in {
       default = pkgs.clawdbot;
       description = "Clawdbot batteries-included package.";
     };
+    
+    manageConfig = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Manage configuration files (clawdbot.json) via Home Manager.";
+    };
+
+    manageDocuments = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Manage document and skill files via Home Manager.";
+    };
 
     toolNames = lib.mkOption {
       type = lib.types.nullOr (lib.types.listOf lib.types.str);
@@ -996,13 +1029,13 @@ in {
     firstParty = {
       summarize.enable = lib.mkOption {
         type = lib.types.bool;
-        default = true;
-        description = "Enable the summarize plugin (first-party).";
+        default = pkgs.stdenv.hostPlatform.isDarwin; # macOS-only: uses macOS-specific dependencies
+        description = "Enable the summarize plugin (first-party, macOS only).";
       };
       peekaboo.enable = lib.mkOption {
         type = lib.types.bool;
-        default = true;
-        description = "Enable the peekaboo plugin (first-party).";
+        default = pkgs.stdenv.hostPlatform.isDarwin; # macOS-only: screenshot tool
+        description = "Enable the peekaboo plugin (first-party, macOS only).";
       };
       oracle.enable = lib.mkOption {
         type = lib.types.bool;
@@ -1022,7 +1055,7 @@ in {
       camsnap.enable = lib.mkOption {
         type = lib.types.bool;
         default = false;
-        description = "Enable the camsnap plugin (first-party).";
+        description = "Enable the camsnap plugin (first-party, macOS only).";
       };
       gogcli.enable = lib.mkOption {
         type = lib.types.bool;
@@ -1042,7 +1075,7 @@ in {
       imsg.enable = lib.mkOption {
         type = lib.types.bool;
         default = false;
-        description = "Enable the imsg plugin (first-party).";
+        description = "Enable the imsg plugin (first-party, macOS only).";
       };
     };
 
@@ -1148,7 +1181,7 @@ in {
     );
 
     home.file =
-      (lib.listToAttrs (map (item: item.homeFile) instanceConfigs))
+      (if cfg.manageConfig then (lib.listToAttrs (map (item: item.homeFile) instanceConfigs)) else {})
       // (lib.optionalAttrs (pkgs.stdenv.hostPlatform.isDarwin && appPackage != null && cfg.installApp) {
         "Applications/Clawdbot.app" = {
           source = "${appPackage}/Applications/Clawdbot.app";
@@ -1157,10 +1190,10 @@ in {
         };
       })
       // (lib.listToAttrs appInstalls)
-      // documentsFiles
-      // skillFiles
-      // pluginSkillsFiles
-      // pluginConfigFiles
+      // (if cfg.manageDocuments then documentsFiles else {})
+      // (if cfg.manageDocuments then skillFiles else {})
+      // (if cfg.manageDocuments then pluginSkillsFiles else {})
+      // (if cfg.manageDocuments then pluginConfigFiles else {})
       // (lib.optionalAttrs cfg.reloadScript.enable {
         ".local/bin/clawdbot-reload" = {
           executable = true;
@@ -1168,7 +1201,7 @@ in {
         };
       });
 
-    home.activation.clawdbotDocumentGuard = lib.mkIf documentsEnabled (
+    home.activation.clawdbotDocumentGuard = lib.mkIf (documentsEnabled && cfg.manageDocuments) (
       lib.hm.dag.entryBefore [ "writeBoundary" ] ''
         set -euo pipefail
         ${documentsGuard}
@@ -1176,19 +1209,19 @@ in {
     );
 
     home.activation.clawdbotDirs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      /bin/mkdir -p ${lib.concatStringsSep " " (lib.concatMap (item: item.dirs) instanceConfigs)}
-      ${lib.optionalString (pluginStateDirsAll != []) "/bin/mkdir -p ${lib.concatStringsSep " " pluginStateDirsAll}"}
+      run mkdir -p ${lib.concatStringsSep " " (lib.concatMap (item: item.dirs) instanceConfigs)}
+      ${lib.optionalString (pluginStateDirsAll != []) "run mkdir -p ${lib.concatStringsSep " " pluginStateDirsAll}"}
     '';
 
-    home.activation.clawdbotConfigFiles = lib.hm.dag.entryAfter [ "clawdbotDirs" ] ''
+    home.activation.clawdbotConfigFiles = lib.mkIf cfg.manageConfig (lib.hm.dag.entryAfter [ "clawdbotDirs" ] ''
       set -euo pipefail
-      ${lib.concatStringsSep "\n" (map (item: "/bin/ln -sfn ${item.configFile} ${item.configPath}") instanceConfigs)}
-    '';
+      ${lib.concatStringsSep "\n" (map (item: "run ln -sfn ${item.configFile} ${item.configPath}") instanceConfigs)}
+    '');
 
-    home.activation.clawdbotPluginGuard = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    home.activation.clawdbotPluginGuard = lib.mkIf cfg.manageDocuments (lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       set -euo pipefail
       ${pluginGuards}
-    '';
+    '');
 
     home.activation.clawdbotAppDefaults = lib.mkIf (pkgs.stdenv.hostPlatform.isDarwin && appDefaults != {}) (
       lib.hm.dag.entryAfter [ "writeBoundary" ] ''
