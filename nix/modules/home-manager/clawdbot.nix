@@ -865,15 +865,16 @@ let
       };
     };
 
-    # Install the gateway runner app when useAppRunner is enabled
-    appRunnerInstall = lib.optionalAttrs (pkgs.stdenv.hostPlatform.isDarwin && inst.launchd.useAppRunner) {
-      name = toRelative inst.launchd.appRunnerPath;
-      value = {
-        source = "${gatewayRunnerApp}/Applications/${appName}.app";
-        recursive = true;
-        force = true;
-      };
-    };
+    # Gateway runner app source path (for activation script to copy)
+    # We use activation instead of home.file because home.file symlinks,
+    # and FDA requires the actual binary to be at the granted path, not a symlink.
+    appRunnerSource = lib.optionalString (pkgs.stdenv.hostPlatform.isDarwin && inst.launchd.useAppRunner)
+      "${gatewayRunnerApp}/Applications/${appName}.app";
+    appRunnerDest = lib.optionalString (pkgs.stdenv.hostPlatform.isDarwin && inst.launchd.useAppRunner)
+      inst.launchd.appRunnerPath;
+
+    # Kept for backwards compatibility but no longer used for app runner
+    appRunnerInstall = {};
 
     systemdService = lib.optionalAttrs (pkgs.stdenv.hostPlatform.isLinux && inst.systemd.enable) {
       "${inst.systemd.unitName}" = {
@@ -925,6 +926,11 @@ let
   instanceConfigs = lib.mapAttrsToList mkInstanceConfig enabledInstances;
   appInstalls = lib.filter (item: item != null) (map (item: item.appInstall) instanceConfigs);
   appRunnerInstalls = lib.filter (item: item != {}) (map (item: item.appRunnerInstall) instanceConfigs);
+  
+  # Collect gateway runner app source/dest pairs for copy activation
+  appRunnerCopyPairs = lib.filter (pair: pair.source != "" && pair.dest != "") (
+    map (item: { source = item.appRunnerSource; dest = item.appRunnerDest; }) instanceConfigs
+  );
 
   appDefaults = lib.foldl' (acc: item: lib.recursiveUpdate acc item.appDefaults) {} instanceConfigs;
 
@@ -1249,7 +1255,8 @@ in {
         };
       })
       // (lib.listToAttrs appInstalls)
-      // (lib.listToAttrs (lib.filter (x: x != {}) (map (item: item.appRunnerInstall) instanceConfigs)))
+      # Note: Gateway runner app is installed via activation script (clawdbotGatewayRunnerCopy)
+      # to ensure it's copied (not symlinked) for FDA to work properly
       // documentsFiles
       // skillFiles
       // pluginSkillsFiles
@@ -1293,6 +1300,20 @@ in {
     home.activation.clawdbotLaunchdRelink = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin (
       lib.hm.dag.entryAfter [ "linkGeneration" ] ''
         /usr/bin/env bash ${./clawdbot-launchd-relink.sh}
+      ''
+    );
+
+    # Copy gateway runner apps (not symlink) so FDA works properly
+    # FDA checks the actual binary path, not symlink targets
+    home.activation.clawdbotGatewayRunnerCopy = lib.mkIf (pkgs.stdenv.hostPlatform.isDarwin && appRunnerCopyPairs != []) (
+      lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        ${lib.concatMapStringsSep "\n" (pair: ''
+          # Remove existing (might be a symlink from previous home-manager)
+          $DRY_RUN_CMD rm -rf "${pair.dest}"
+          # Copy the app bundle (not symlink, so FDA works)
+          $DRY_RUN_CMD cp -R "${pair.source}" "${pair.dest}"
+          $DRY_RUN_CMD chmod -R u+w "${pair.dest}"
+        '') appRunnerCopyPairs}
       ''
     );
 
