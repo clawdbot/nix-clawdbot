@@ -12,6 +12,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Verify flake.lock owners
+        run: scripts/check-flake-lock-owners.sh
+
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v13
 
