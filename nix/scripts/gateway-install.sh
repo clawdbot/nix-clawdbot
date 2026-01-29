@@ -2,7 +2,15 @@
 set -e
 mkdir -p "$out/lib/moltbot" "$out/bin"
 
+# Copy core files and bundled extensions (memory-core, etc.)
 cp -r dist node_modules package.json ui "$out/lib/moltbot/"
+# Copy docs (includes workspace templates like AGENTS.md)
+if [ -d "docs" ]; then
+  cp -r docs "$out/lib/moltbot/"
+fi
+if [ -d "extensions" ]; then
+  cp -r extensions "$out/lib/moltbot/"
+fi
 
 if [ -z "${STDENV_SETUP:-}" ]; then
   echo "STDENV_SETUP is not set" >&2
@@ -16,6 +24,14 @@ fi
 bash -e -c '. "$STDENV_SETUP"; patchShebangs "$out/lib/moltbot/node_modules/.bin"'
 if [ -d "$out/lib/moltbot/ui/node_modules/.bin" ]; then
   bash -e -c '. "$STDENV_SETUP"; patchShebangs "$out/lib/moltbot/ui/node_modules/.bin"'
+fi
+# Patch shebangs in extensions node_modules if present
+if [ -d "$out/lib/moltbot/extensions" ]; then
+  for ext_bin in "$out/lib/moltbot/extensions"/*/node_modules/.bin; do
+    if [ -d "$ext_bin" ]; then
+      bash -e -c '. "$STDENV_SETUP"; patchShebangs "'"$ext_bin"'"'
+    fi
+  done
 fi
 
 # Work around missing dependency declaration in pi-coding-agent (strip-ansi).
