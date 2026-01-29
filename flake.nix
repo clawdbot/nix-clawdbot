@@ -20,7 +20,7 @@
     let
       overlay = import ./nix/overlay.nix;
       sourceInfoStable = import ./nix/sources/moltbot-source.nix;
-      systems = [ "x86_64-linux" "aarch64-darwin" ];
+      systems = [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ];
     in
     flake-utils.lib.eachSystem systems (system:
       let
@@ -55,6 +55,10 @@
           config-options = pkgs.callPackage ./nix/checks/moltbot-config-options.nix {
             sourceInfo = sourceInfoStable;
           };
+          nixos-module = import ./nix/checks/nixos-module-test.nix {
+            inherit pkgs;
+            moltbotModule = self.nixosModules.moltbot;
+          };
         } else {});
 
         devShells.default = pkgs.mkShell {
@@ -69,5 +73,6 @@
       overlays.default = overlay;
       homeManagerModules.moltbot = import ./nix/modules/home-manager/moltbot.nix;
       darwinModules.moltbot = import ./nix/modules/darwin/moltbot.nix;
+      nixosModules.moltbot = import ./nix/modules/nixos/moltbot.nix;
     };
 }

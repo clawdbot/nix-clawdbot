@@ -36,7 +36,7 @@ let
   };
 
   mkTelegramConfig = inst: lib.optionalAttrs inst.providers.telegram.enable {
-    telegram = {
+    channels.telegram = {
       enabled = true;
       tokenFile = inst.providers.telegram.botTokenFile;
       allowFrom = inst.providers.telegram.allowFrom;
@@ -48,7 +48,7 @@ let
     messages = {
       queue = {
         mode = inst.routing.queue.mode;
-        byProvider = inst.routing.queue.byProvider;
+        byChannel = inst.routing.queue.byChannel;
       };
     };
   };
@@ -211,14 +211,14 @@ let
           description = "Queue mode when a run is active.";
         };
 
-        byProvider = lib.mkOption {
+        byChannel = lib.mkOption {
           type = lib.types.attrs;
           default = {
             telegram = "interrupt";
             discord = "queue";
             webchat = "queue";
           };
-          description = "Per-provider queue mode overrides.";
+          description = "Per-channel queue mode overrides.";
         };
       };
 
@@ -300,13 +300,18 @@ let
     configPath = "${cfg.stateDir}/moltbot.json";
     logPath = "/tmp/moltbot/moltbot-gateway.log";
     gatewayPort = 18789;
+    gatewayPath = null;
+    gatewayPnpmDepsHash = lib.fakeHash;
     providers = cfg.providers;
     routing = cfg.routing;
     launchd = cfg.launchd;
     systemd = cfg.systemd;
     plugins = cfg.plugins;
     configOverrides = {};
-    config = {};
+    agent = {
+      model = cfg.defaults.model;
+      thinkingDefault = cfg.defaults.thinkingDefault;
+    };
     appDefaults = {
       enable = true;
       attachExistingOnly = true;
@@ -806,20 +811,20 @@ let
         };
         Service = {
           ExecStart = "${gatewayWrapper}/bin/moltbot-gateway-${name} gateway --port ${toString inst.gatewayPort}";
-          WorkingDirectory = inst.stateDir;
+          WorkingDirectory = resolvePath inst.stateDir;
           Restart = "always";
           RestartSec = "1s";
           Environment = [
             "HOME=${homeDir}"
-            "MOLTBOT_CONFIG_PATH=${inst.configPath}"
-            "MOLTBOT_STATE_DIR=${inst.stateDir}"
+            "MOLTBOT_CONFIG_PATH=${resolvePath inst.configPath}"
+            "MOLTBOT_STATE_DIR=${resolvePath inst.stateDir}"
             "MOLTBOT_NIX_MODE=1"
-            "CLAWDBOT_CONFIG_PATH=${inst.configPath}"
-            "CLAWDBOT_STATE_DIR=${inst.stateDir}"
+            "CLAWDBOT_CONFIG_PATH=${resolvePath inst.configPath}"
+            "CLAWDBOT_STATE_DIR=${resolvePath inst.stateDir}"
             "CLAWDBOT_NIX_MODE=1"
           ];
-          StandardOutput = "append:${inst.logPath}";
-          StandardError = "append:${inst.logPath}";
+          StandardOutput = "append:${resolvePath inst.logPath}";
+          StandardError = "append:${resolvePath inst.logPath}";
         };
         Install = {
           WantedBy = [ "default.target" ];
@@ -1082,17 +1087,16 @@ in {
         description = "Queue mode when a run is active.";
       };
 
-      byProvider = lib.mkOption {
+      byChannel = lib.mkOption {
         type = lib.types.attrs;
         default = {
           telegram = "interrupt";
           discord = "queue";
           webchat = "queue";
         };
-        description = "Per-provider queue mode overrides.";
+        description = "Per-channel queue mode overrides.";
       };
     };
-
 
     launchd.enable = lib.mkOption {
       type = lib.types.bool;
@@ -1175,13 +1179,12 @@ in {
     );
 
     home.activation.moltbotDirs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      /bin/mkdir -p ${lib.concatStringsSep " " (lib.concatMap (item: item.dirs) instanceConfigs)}
-      ${lib.optionalString (pluginStateDirsAll != []) "/bin/mkdir -p ${lib.concatStringsSep " " pluginStateDirsAll}"}
+      run mkdir -p ${lib.concatStringsSep " " (lib.concatMap (item: item.dirs) instanceConfigs)}
+      ${lib.optionalString (pluginStateDirsAll != []) "run mkdir -p ${lib.concatStringsSep " " pluginStateDirsAll}"}
     '';
 
     home.activation.moltbotConfigFiles = lib.hm.dag.entryAfter [ "moltbotDirs" ] ''
-      set -euo pipefail
-      ${lib.concatStringsSep "\n" (map (item: "/bin/ln -sfn ${item.configFile} ${item.configPath}") instanceConfigs)}
+      ${lib.concatStringsSep "\n" (map (item: "run ln -sfn ${item.configFile} ${item.configPath}") instanceConfigs)}
     '';
 
     home.activation.moltbotPluginGuard = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
