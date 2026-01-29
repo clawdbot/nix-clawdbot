@@ -311,6 +311,9 @@ in
           };
         }; };
         };
+        extraPaths = lib.mkOption {
+          type = t.listOf (t.str);
+        };
         fallback = lib.mkOption {
           type = t.oneOf [ t.enum [ "openai" ] t.enum [ "gemini" ] t.enum [ "local" ] t.enum [ "none" ] ];
         };
@@ -776,6 +779,9 @@ in
             type = t.bool;
           };
         }; };
+        };
+        extraPaths = lib.mkOption {
+          type = t.listOf (t.str);
         };
         fallback = lib.mkOption {
           type = t.oneOf [ t.enum [ "openai" ] t.enum [ "gemini" ] t.enum [ "local" ] t.enum [ "none" ] ];

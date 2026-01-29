@@ -23,4 +23,5 @@ export VITEST_MAX_THREADS="1"
 export VITEST_MIN_WORKERS="1"
 export VITEST_MAX_WORKERS="1"
 
-pnpm test -- --testTimeout=20000
+pnpm vitest run --config vitest.unit.config.ts --testTimeout=20000
+pnpm vitest run --config vitest.gateway.config.ts --testTimeout=20000

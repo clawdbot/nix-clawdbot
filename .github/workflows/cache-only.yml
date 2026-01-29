@@ -51,13 +51,13 @@ jobs:
             fallback = false
         run: |
           nix build --no-link --accept-flake-config \
-            .#packages.aarch64-darwin.clawdbot \
-            .#packages.aarch64-darwin.clawdbot-gateway \
-            .#packages.aarch64-darwin.clawdbot-tools \
-            .#packages.aarch64-darwin.clawdbot-app \
-            .#packages.x86_64-linux.clawdbot \
-            .#packages.x86_64-linux.clawdbot-gateway \
-            .#packages.x86_64-linux.clawdbot-tools \
+            .#packages.aarch64-darwin.moltbot \
+            .#packages.aarch64-darwin.moltbot-gateway \
+            .#packages.aarch64-darwin.moltbot-tools \
+            .#packages.aarch64-darwin.moltbot-app \
+            .#packages.x86_64-linux.moltbot \
+            .#packages.x86_64-linux.moltbot-gateway \
+            .#packages.x86_64-linux.moltbot-tools \
             .#checks.aarch64-darwin.gateway \
             .#checks.x86_64-linux.gateway \
             .#checks.x86_64-linux.gateway-tests \
