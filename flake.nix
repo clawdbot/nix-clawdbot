@@ -57,7 +57,7 @@
           };
           nixos-module = import ./nix/checks/nixos-module-test.nix {
             inherit pkgs;
-            clawdbotModule = self.nixosModules.clawdbot;
+            moltbotModule = self.nixosModules.moltbot;
           };
         } else {});
 
