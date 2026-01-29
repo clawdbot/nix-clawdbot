@@ -1,10 +1,10 @@
-# AGENTS.md — nix-clawdbot
+# AGENTS.md — nix-moltbot
 
 Single source of truth for product direction: `README.md`.
 
 Documentation policy:
 - Keep the surface area small.
-- Avoid duplicate “pointer‑only” files.
+- Avoid duplicate "pointer‑only" files.
 - Update `README.md` first, then adjust references.
 
 Defaults:
@@ -14,24 +14,24 @@ Defaults:
 - Breaking changes are acceptable pre‑1.0.0 (move fast, keep docs accurate).
 - NO INLINE SCRIPTS EVER.
 - NEVER send any message (iMessage, email, SMS, etc.) without explicit user confirmation:
-  - Always show the full message text and ask: “I’m going to send this: <message>. Send? (y/n)”
+  - Always show the full message text and ask: "I'm going to send this: <message>. Send? (y/n)"
 
-Clawdbot packaging:
+Moltbot packaging:
 - The gateway package must include Control UI assets (run `pnpm ui:build` in the Nix build).
 
 Golden path for pins (yolo + manual bumps):
 - Hourly GitHub Action **Yolo Update Pins** runs `scripts/update-pins.sh`, which:
-  - Picks latest upstream clawdbot SHA with green non-Windows checks
+  - Picks latest upstream moltbot SHA with green non-Windows checks
   - Rebuilds gateway to refresh `pnpmDepsHash`
-  - Regenerates `nix/generated/clawdbot-config-options.nix` from upstream schema
+  - Regenerates `nix/generated/moltbot-config-options.nix` from upstream schema
   - Updates app pin/hash, commits, rebases, pushes to `main`
 - Manual bump (rare): `GH_TOKEN=... scripts/update-pins.sh` (same steps as above). Use only if yolo is blocked.
-- To verify freshness: `git pull --ff-only` and check `nix/sources/clawdbot-source.nix` vs `git ls-remote https://github.com/clawdbot/clawdbot.git refs/heads/main`.
+- To verify freshness: `git pull --ff-only` and check `nix/sources/moltbot-source.nix` vs `git ls-remote https://github.com/moltbot/moltbot.git refs/heads/main`.
 - If upstream is moving fast and tighter freshness is needed, trigger yolo manually: `gh workflow run "Yolo Update Pins"`.
 
 Philosophy:
 
-The Zen of ~~Python~~ Clawdbot, ~~by~~ shamelessly stolen from Tim Peters
+The Zen of ~~Python~~ Moltbot, ~~by~~ shamelessly stolen from Tim Peters
 
 Beautiful is better than ugly.  
 Explicit is better than implicit.  

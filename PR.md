@@ -2,13 +2,13 @@
 
 ## Issue
 
-https://github.com/clawdbot/nix-clawdbot/issues/22
+https://github.com/moltbot/nix-moltbot/issues/22
 
-Upstream issue: https://github.com/clawdbot/clawdbot/issues/2341
+Upstream issue: https://github.com/moltbot/moltbot/issues/2341
 
 ## Goal
 
-Add a NixOS module (`nixosModules.clawdbot`) that runs the gateway as an isolated system user instead of the personal user account.
+Add a NixOS module (`nixosModules.moltbot`) that runs the gateway as an isolated system user instead of the personal user account.
 
 ## Security Motivation
 
@@ -22,13 +22,13 @@ Tested and deployed successfully. The service runs with full systemd hardening.
 
 ### Files
 
-- `nix/modules/nixos/clawdbot.nix` - Main module
+- `nix/modules/nixos/moltbot.nix` - Main module
 - `nix/modules/nixos/options.nix` - Option definitions
 - `nix/modules/nixos/documents-skills.nix` - Documents and skills installation
 
 ### Features
 
-- Dedicated `clawdbot` system user with minimal privileges
+- Dedicated `moltbot` system user with minimal privileges
 - System-level systemd service with hardening:
   - `ProtectHome=true`
   - `ProtectSystem=strict`
@@ -46,9 +46,9 @@ Tested and deployed successfully. The service runs with full systemd hardening.
 Uses `providers.anthropic.oauthTokenFile` - a long-lived token from `claude setup-token`.
 
 ```nix
-services.clawdbot = {
+services.moltbot = {
   enable = true;
-  providers.anthropic.oauthTokenFile = config.age.secrets.clawdbot-token.path;
+  providers.anthropic.oauthTokenFile = config.age.secrets.moltbot-token.path;
   providers.telegram = {
     enable = true;
     botTokenFile = config.age.secrets.telegram-token.path;
