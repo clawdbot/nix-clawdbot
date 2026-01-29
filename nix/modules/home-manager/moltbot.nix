@@ -48,7 +48,6 @@ let
     messages = {
       queue = {
         mode = inst.routing.queue.mode;
-        byProvider = inst.routing.queue.byProvider;
       };
     };
   };
@@ -1000,8 +999,8 @@ in {
       };
       peekaboo.enable = lib.mkOption {
         type = lib.types.bool;
-        default = true;
-        description = "Enable the peekaboo plugin (first-party).";
+        default = pkgs.stdenv.isDarwin;
+        description = "Enable the peekaboo plugin (first-party, macOS only).";
       };
       oracle.enable = lib.mkOption {
         type = lib.types.bool;
@@ -1175,13 +1174,13 @@ in {
     );
 
     home.activation.moltbotDirs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      /bin/mkdir -p ${lib.concatStringsSep " " (lib.concatMap (item: item.dirs) instanceConfigs)}
-      ${lib.optionalString (pluginStateDirsAll != []) "/bin/mkdir -p ${lib.concatStringsSep " " pluginStateDirsAll}"}
+      ${pkgs.coreutils}/bin/mkdir -p ${lib.concatStringsSep " " (lib.concatMap (item: item.dirs) instanceConfigs)}
+      ${lib.optionalString (pluginStateDirsAll != []) "${pkgs.coreutils}/bin/mkdir -p ${lib.concatStringsSep " " pluginStateDirsAll}"}
     '';
 
     home.activation.moltbotConfigFiles = lib.hm.dag.entryAfter [ "moltbotDirs" ] ''
       set -euo pipefail
-      ${lib.concatStringsSep "\n" (map (item: "/bin/ln -sfn ${item.configFile} ${item.configPath}") instanceConfigs)}
+      ${lib.concatStringsSep "\n" (map (item: "${pkgs.coreutils}/bin/ln -sfn ${item.configFile} ${item.configPath}") instanceConfigs)}
     '';
 
     home.activation.moltbotPluginGuard = lib.hm.dag.entryAfter [ "writeBoundary" ] ''

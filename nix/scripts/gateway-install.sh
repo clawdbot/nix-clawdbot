@@ -7,6 +7,16 @@ if [ -d extensions ]; then
   cp -r extensions "$out/lib/moltbot/"
 fi
 
+# Copy bundled extensions (memory-core, etc.) if present
+if [ -d "extensions" ]; then
+  cp -r extensions "$out/lib/moltbot/"
+fi
+
+# Copy docs (workspace templates like AGENTS.md, SOUL.md, TOOLS.md)
+if [ -d "docs" ]; then
+  cp -r docs "$out/lib/moltbot/"
+fi
+
 if [ -z "${STDENV_SETUP:-}" ]; then
   echo "STDENV_SETUP is not set" >&2
   exit 1
@@ -37,4 +47,4 @@ if [ -n "$strip_ansi_src" ]; then
     ln -s "$strip_ansi_src" "$out/lib/moltbot/node_modules/strip-ansi"
   fi
 fi
-bash -e -c '. "$STDENV_SETUP"; makeWrapper "$NODE_BIN" "$out/bin/moltbot" --add-flags "$out/lib/moltbot/dist/index.js" --set-default MOLTBOT_NIX_MODE "1" --set-default CLAWDBOT_NIX_MODE "1"'
+bash -e -c '. "$STDENV_SETUP"; makeWrapper "$NODE_BIN" "$out/bin/moltbot" --add-flags "$out/lib/moltbot/dist/index.js" --set-default MOLTBOT_NIX_MODE "1" --set-default CLAWDBOT_NIX_MODE "1" --set-default MOLTBOT_BUNDLED_PLUGINS_DIR "$out/lib/moltbot/extensions"'
