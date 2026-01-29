@@ -4,6 +4,10 @@ mkdir -p "$out/lib/moltbot" "$out/bin"
 
 cp -r dist node_modules package.json ui "$out/lib/moltbot/"
 
+# Include workspace templates needed at runtime
+mkdir -p "$out/lib/clawdbot/docs/reference"
+cp -r docs/reference/templates "$out/lib/clawdbot/docs/reference/"
+
 if [ -z "${STDENV_SETUP:-}" ]; then
   echo "STDENV_SETUP is not set" >&2
   exit 1
