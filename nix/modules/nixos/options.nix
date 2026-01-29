@@ -1,13 +1,13 @@
-# NixOS module options for Clawdbot system service
+# NixOS module options for Moltbot system service
 #
-# TODO: Consolidate with home-manager/clawdbot.nix options
+# TODO: Consolidate with home-manager/moltbot.nix options
 # This file duplicates option definitions for NixOS system service support.
 # The duplication is intentional to avoid risking the stable home-manager module
 # while adding NixOS support. Once patterns stabilize, extract shared options.
 #
 # Key differences from home-manager:
-# - Namespace: services.clawdbot (not programs.clawdbot)
-# - Paths: /var/lib/clawdbot (not ~/.clawdbot)
+# - Namespace: services.moltbot (not programs.moltbot)
+# - Paths: /var/lib/moltbot (not ~/.moltbot)
 # - Adds: user, group options for system user
 # - Removes: launchd.*, app.*, appDefaults.* (macOS-specific)
 # - systemd options are for system services (not user services)
@@ -15,20 +15,20 @@
 { lib, cfg, defaultPackage }:
 
 let
-  stateDir = "/var/lib/clawdbot";
+  stateDir = "/var/lib/moltbot";
 
   instanceModule = { name, config, ... }: {
     options = {
       enable = lib.mkOption {
         type = lib.types.bool;
         default = true;
-        description = "Enable this Clawdbot instance.";
+        description = "Enable this Moltbot instance.";
       };
 
       package = lib.mkOption {
         type = lib.types.package;
         default = defaultPackage;
-        description = "Clawdbot batteries-included package.";
+        description = "Moltbot batteries-included package.";
       };
 
       stateDir = lib.mkOption {
@@ -36,25 +36,25 @@ let
         default = if name == "default"
           then stateDir
           else "${stateDir}-${name}";
-        description = "State directory for this Clawdbot instance.";
+        description = "State directory for this Moltbot instance.";
       };
 
       workspaceDir = lib.mkOption {
         type = lib.types.str;
         default = "${config.stateDir}/workspace";
-        description = "Workspace directory for this Clawdbot instance.";
+        description = "Workspace directory for this Moltbot instance.";
       };
 
       configPath = lib.mkOption {
         type = lib.types.str;
-        default = "${config.stateDir}/clawdbot.json";
-        description = "Path to generated Clawdbot config JSON.";
+        default = "${config.stateDir}/moltbot.json";
+        description = "Path to generated Moltbot config JSON.";
       };
 
       gatewayPort = lib.mkOption {
         type = lib.types.int;
         default = 18789;
-        description = "Gateway port for this Clawdbot instance.";
+        description = "Gateway port for this Moltbot instance.";
       };
 
       providers.telegram = {
@@ -98,7 +98,7 @@ let
             Generate with `claude setup-token` - these tokens are long-lived.
             This is the recommended auth method for headless/server deployments.
           '';
-          example = "/run/agenix/clawdbot-anthropic-token";
+          example = "/run/agenix/moltbot-anthropic-token";
         };
       };
 
@@ -165,7 +165,7 @@ let
             Path to file containing the gateway authentication token.
             Required when auth mode is "token".
           '';
-          example = "/run/agenix/clawdbot-gateway-token";
+          example = "/run/agenix/moltbot-gateway-token";
         };
 
         passwordFile = lib.mkOption {
@@ -175,7 +175,7 @@ let
             Path to file containing the gateway authentication password.
             Required when auth mode is "password".
           '';
-          example = "/run/agenix/clawdbot-gateway-password";
+          example = "/run/agenix/moltbot-gateway-password";
         };
       };
 
@@ -190,25 +190,25 @@ let
 in {
   inherit instanceModule;
 
-  # Top-level options for services.clawdbot
+  # Top-level options for services.moltbot
   topLevelOptions = {
-    enable = lib.mkEnableOption "Clawdbot system service";
+    enable = lib.mkEnableOption "Moltbot system service";
 
     package = lib.mkOption {
       type = lib.types.package;
-      description = "Clawdbot batteries-included package.";
+      description = "Moltbot batteries-included package.";
     };
 
     user = lib.mkOption {
       type = lib.types.str;
-      default = "clawdbot";
-      description = "System user to run the Clawdbot gateway.";
+      default = "moltbot";
+      description = "System user to run the Moltbot gateway.";
     };
 
     group = lib.mkOption {
       type = lib.types.str;
-      default = "clawdbot";
-      description = "System group for the Clawdbot user.";
+      default = "moltbot";
+      description = "System group for the Moltbot user.";
     };
 
     toolNames = lib.mkOption {
@@ -226,13 +226,13 @@ in {
     stateDir = lib.mkOption {
       type = lib.types.str;
       default = stateDir;
-      description = "State directory for Clawdbot.";
+      description = "State directory for Moltbot.";
     };
 
     workspaceDir = lib.mkOption {
       type = lib.types.str;
       default = "${stateDir}/workspace";
-      description = "Workspace directory for Clawdbot agent skills.";
+      description = "Workspace directory for Moltbot agent skills.";
     };
 
     documents = lib.mkOption {
@@ -263,10 +263,10 @@ in {
             default = "";
             description = "Optional skill body (markdown).";
           };
-          clawdbot = lib.mkOption {
+          moltbot = lib.mkOption {
             type = lib.types.nullOr lib.types.attrs;
             default = null;
-            description = "Optional clawdbot metadata.";
+            description = "Optional moltbot metadata.";
           };
           mode = lib.mkOption {
             type = lib.types.enum [ "copy" "inline" ];
@@ -350,7 +350,7 @@ in {
           Generate with `claude setup-token` - these tokens are long-lived.
           This is the recommended auth method for headless/server deployments.
         '';
-        example = "/run/agenix/clawdbot-anthropic-token";
+        example = "/run/agenix/moltbot-anthropic-token";
       };
     };
 
@@ -386,7 +386,7 @@ in {
           Path to file containing the gateway authentication token.
           Required when auth mode is "token".
         '';
-        example = "/run/agenix/clawdbot-gateway-token";
+        example = "/run/agenix/moltbot-gateway-token";
       };
 
       passwordFile = lib.mkOption {
@@ -396,7 +396,7 @@ in {
           Path to file containing the gateway authentication password.
           Required when auth mode is "password".
         '';
-        example = "/run/agenix/clawdbot-gateway-password";
+        example = "/run/agenix/moltbot-gateway-password";
       };
     };
   };
