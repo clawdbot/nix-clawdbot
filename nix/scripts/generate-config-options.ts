@@ -235,6 +235,117 @@ const renderOption = (key: string, schemaObj: JsonSchema, _required: boolean, in
   return lines.join("\n");
 };
 
+// --- Metadata collection ---
+
+interface TypeMeta {
+  type: string;
+  values?: unknown[];
+  alternatives?: TypeMeta[];
+  items?: TypeMeta;
+}
+
+const collectTypeMeta = (schemaObj: JsonSchema): TypeMeta => {
+  const { schema, nullable } = stripNullable(schemaObj);
+  const base = collectBaseTypeMeta(schema);
+  if (nullable) return { type: "nullable", alternatives: [base] };
+  return base;
+};
+
+const collectBaseTypeMeta = (schemaObj: JsonSchema): TypeMeta => {
+  const schema = deref(schemaObj, new Set());
+  if (schema.const !== undefined) return { type: "enum", values: [schema.const] };
+  if (Array.isArray(schema.enum)) return { type: "enum", values: schema.enum };
+
+  if (schema.anyOf && Array.isArray(schema.anyOf)) {
+    const entries = (schema.anyOf as JsonSchema[]).filter((e) => !isNullSchema(e));
+    if (entries.length === 1) return collectTypeMeta(entries[0]);
+    const alts = entries.map(collectTypeMeta);
+    if (alts.every((a) => a.type === "enum" && a.values?.length === 1)) {
+      return { type: "enum", values: alts.map((a) => a.values![0]) };
+    }
+    return { type: "oneOf", alternatives: alts };
+  }
+  if (schema.oneOf && Array.isArray(schema.oneOf)) {
+    const entries = (schema.oneOf as JsonSchema[]).filter((e) => !isNullSchema(e));
+    if (entries.length === 1) return collectTypeMeta(entries[0]);
+    const alts = entries.map(collectTypeMeta);
+    if (alts.every((a) => a.type === "enum" && a.values?.length === 1)) {
+      return { type: "enum", values: alts.map((a) => a.values![0]) };
+    }
+    return { type: "oneOf", alternatives: alts };
+  }
+
+  switch (schema.type) {
+    case "string": return { type: "string" };
+    case "number": return { type: "number" };
+    case "integer": return { type: "integer" };
+    case "boolean": return { type: "boolean" };
+    case "array": {
+      const items = (schema.items as JsonSchema) || {};
+      return { type: "array", items: collectTypeMeta(items) };
+    }
+    case "object":
+      return { type: "object" };
+    default:
+      if (schema.properties || schema.additionalProperties)
+        return { type: "object" };
+      return { type: "any" };
+  }
+};
+
+interface SchemaMetadata {
+  version: string;
+  validPaths: Record<string, string[]>;
+  types: Record<string, TypeMeta>;
+  dynamicKeys: string[];
+  knownChannels: string[];
+}
+
+const collectPaths = (
+  schemaObj: JsonSchema,
+  path: string,
+  metadata: SchemaMetadata,
+  seen: Set<string>,
+): void => {
+  const schema = deref(schemaObj, new Set());
+  const properties = (schema.properties as Record<string, JsonSchema>) || {};
+  const keys = Object.keys(properties).sort();
+
+  if (keys.length === 0) {
+    if (schema.additionalProperties && typeof schema.additionalProperties === "object") {
+      metadata.dynamicKeys.push(path);
+      // Recurse into additionalProperties value schema with wildcard
+      const valueSchema = deref(schema.additionalProperties as JsonSchema, new Set());
+      if (valueSchema.properties) {
+        collectPaths(valueSchema, `${path}.*`, metadata, seen);
+      }
+    } else if (schema.additionalProperties === true) {
+      metadata.dynamicKeys.push(path);
+    }
+    return;
+  }
+
+  metadata.validPaths[path] = keys;
+
+  for (const key of keys) {
+    const childSchema = deref(properties[key], new Set());
+    const childPath = path === "" ? key : `${path}.${key}`;
+    const typeMeta = collectTypeMeta(properties[key]);
+    metadata.types[childPath] = typeMeta;
+
+    if (childSchema.type === "object" || childSchema.properties || childSchema.additionalProperties) {
+      collectPaths(childSchema, childPath, metadata, seen);
+    }
+    // Recurse into submodules that are behind $ref
+    if (properties[key].$ref) {
+      const resolved = deref(properties[key], new Set());
+      if (resolved.properties || resolved.additionalProperties) {
+        collectPaths(resolved, childPath, metadata, seen);
+      }
+    }
+  }
+};
+
   const rootSchema = deref(schema as JsonSchema, new Set());
   const rootProps = (rootSchema.properties as Record<string, JsonSchema>) || {};
   const requiredRoot = new Set((rootSchema.required as string[]) || []);
@@ -248,6 +359,27 @@ const renderOption = (key: string, schemaObj: JsonSchema, _required: boolean, in
 
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
   fs.writeFileSync(outPath, output, "utf8");
+
+  // --- Generate metadata JSON ---
+  const metadata: SchemaMetadata = {
+    version: "1.0",
+    validPaths: {},
+    types: {},
+    dynamicKeys: [],
+    knownChannels: [],
+  };
+
+  collectPaths(rootSchema, "", metadata, new Set());
+
+  // Extract known channels from channels.* keys
+  const channelsSchema = deref(rootProps.channels || {}, new Set());
+  const channelProps = (channelsSchema.properties as Record<string, JsonSchema>) || {};
+  metadata.knownChannels = Object.keys(channelProps)
+    .filter((k) => k !== "defaults")
+    .sort();
+
+  const metadataPath = path.join(path.dirname(outPath), "openclaw-config-metadata.json");
+  fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2) + "\n", "utf8");
 };
 
 main().catch((err) => {
