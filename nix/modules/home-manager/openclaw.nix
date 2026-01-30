@@ -48,7 +48,6 @@ let
     messages = {
       queue = {
         mode = inst.routing.queue.mode;
-        byProvider = inst.routing.queue.byProvider;
       };
     };
   };
@@ -211,15 +210,6 @@ let
           description = "Queue mode when a run is active.";
         };
 
-        byProvider = lib.mkOption {
-          type = lib.types.attrs;
-          default = {
-            telegram = "interrupt";
-            discord = "queue";
-            webchat = "queue";
-          };
-          description = "Per-provider queue mode overrides.";
-        };
       };
 
       
@@ -1082,15 +1072,6 @@ in {
         description = "Queue mode when a run is active.";
       };
 
-      byProvider = lib.mkOption {
-        type = lib.types.attrs;
-        default = {
-          telegram = "interrupt";
-          discord = "queue";
-          webchat = "queue";
-        };
-        description = "Per-provider queue mode overrides.";
-      };
     };
 
 
