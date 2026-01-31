@@ -2,10 +2,7 @@
 set -e
 mkdir -p "$out/lib/openclaw" "$out/bin"
 
-cp -r dist node_modules package.json ui "$out/lib/openclaw/"
-if [ -d extensions ]; then
-  cp -r extensions "$out/lib/openclaw/"
-fi
+cp -r dist node_modules package.json ui extensions docs "$out/lib/openclaw/"
 
 if [ -z "${STDENV_SETUP:-}" ]; then
   echo "STDENV_SETUP is not set" >&2
