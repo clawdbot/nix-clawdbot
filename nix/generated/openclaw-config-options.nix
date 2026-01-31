@@ -1878,7 +1878,8 @@ in
           default = null;
         };
         dmPolicy = lib.mkOption {
-          type = t.enum [ "pairing" "allowlist" "open" "disabled" ];
+          type = t.nullOr (t.enum [ "pairing" "allowlist" "open" "disabled" ]);
+          default = null;
         };
         dms = lib.mkOption {
           type = t.nullOr (t.attrsOf (t.submodule { options = {
@@ -1898,7 +1899,8 @@ in
           default = null;
         };
         groupPolicy = lib.mkOption {
-          type = t.enum [ "open" "disabled" "allowlist" ];
+          type = t.nullOr (t.enum [ "open" "disabled" "allowlist" ]);
+          default = null;
         };
         groups = lib.mkOption {
           type = t.nullOr (t.attrsOf (t.submodule { options = {
@@ -2095,7 +2097,8 @@ in
         default = null;
       };
       dmPolicy = lib.mkOption {
-        type = t.enum [ "pairing" "allowlist" "open" "disabled" ];
+        type = t.nullOr (t.enum [ "pairing" "allowlist" "open" "disabled" ]);
+        default = null;
       };
       dms = lib.mkOption {
         type = t.nullOr (t.attrsOf (t.submodule { options = {
@@ -2115,7 +2118,8 @@ in
         default = null;
       };
       groupPolicy = lib.mkOption {
-        type = t.enum [ "open" "disabled" "allowlist" ];
+        type = t.nullOr (t.enum [ "open" "disabled" "allowlist" ]);
+        default = null;
       };
       groups = lib.mkOption {
         type = t.nullOr (t.attrsOf (t.submodule { options = {
@@ -2397,7 +2401,8 @@ in
             default = null;
           };
           policy = lib.mkOption {
-            type = t.enum [ "pairing" "allowlist" "open" "disabled" ];
+            type = t.nullOr (t.enum [ "pairing" "allowlist" "open" "disabled" ]);
+            default = null;
           };
         }; });
           default = null;
@@ -2441,7 +2446,8 @@ in
           default = null;
         };
         groupPolicy = lib.mkOption {
-          type = t.enum [ "open" "disabled" "allowlist" ];
+          type = t.nullOr (t.enum [ "open" "disabled" "allowlist" ]);
+          default = null;
         };
         guilds = lib.mkOption {
           type = t.nullOr (t.attrsOf (t.submodule { options = {
@@ -2802,7 +2808,8 @@ in
           default = null;
         };
         policy = lib.mkOption {
-          type = t.enum [ "pairing" "allowlist" "open" "disabled" ];
+          type = t.nullOr (t.enum [ "pairing" "allowlist" "open" "disabled" ]);
+          default = null;
         };
       }; });
         default = null;
@@ -2846,7 +2853,8 @@ in
         default = null;
       };
       groupPolicy = lib.mkOption {
-        type = t.enum [ "open" "disabled" "allowlist" ];
+        type = t.nullOr (t.enum [ "open" "disabled" "allowlist" ]);
+        default = null;
       };
       guilds = lib.mkOption {
         type = t.nullOr (t.attrsOf (t.submodule { options = {
@@ -3134,7 +3142,8 @@ in
             default = null;
           };
           policy = lib.mkOption {
-            type = t.enum [ "pairing" "allowlist" "open" "disabled" ];
+            type = t.nullOr (t.enum [ "pairing" "allowlist" "open" "disabled" ]);
+            default = null;
           };
         }; });
           default = null;
@@ -3161,7 +3170,8 @@ in
           default = null;
         };
         groupPolicy = lib.mkOption {
-          type = t.enum [ "open" "disabled" "allowlist" ];
+          type = t.nullOr (t.enum [ "open" "disabled" "allowlist" ]);
+          default = null;
         };
         groups = lib.mkOption {
           type = t.nullOr (t.attrsOf (t.submodule { options = {
@@ -3308,7 +3318,8 @@ in
           default = null;
         };
         policy = lib.mkOption {
-          type = t.enum [ "pairing" "allowlist" "open" "disabled" ];
+          type = t.nullOr (t.enum [ "pairing" "allowlist" "open" "disabled" ]);
+          default = null;
         };
       }; });
         default = null;
@@ -3335,7 +3346,8 @@ in
         default = null;
       };
       groupPolicy = lib.mkOption {
-        type = t.enum [ "open" "disabled" "allowlist" ];
+        type = t.nullOr (t.enum [ "open" "disabled" "allowlist" ]);
+        default = null;
       };
       groups = lib.mkOption {
         type = t.nullOr (t.attrsOf (t.submodule { options = {
@@ -3463,7 +3475,8 @@ in
           default = null;
         };
         dmPolicy = lib.mkOption {
-          type = t.enum [ "pairing" "allowlist" "open" "disabled" ];
+          type = t.nullOr (t.enum [ "pairing" "allowlist" "open" "disabled" ]);
+          default = null;
         };
         dms = lib.mkOption {
           type = t.nullOr (t.attrsOf (t.submodule { options = {
@@ -3483,7 +3496,8 @@ in
           default = null;
         };
         groupPolicy = lib.mkOption {
-          type = t.enum [ "open" "disabled" "allowlist" ];
+          type = t.nullOr (t.enum [ "open" "disabled" "allowlist" ]);
+          default = null;
         };
         groups = lib.mkOption {
           type = t.nullOr (t.attrsOf (t.submodule { options = {
@@ -3639,7 +3653,8 @@ in
         default = null;
       };
       dmPolicy = lib.mkOption {
-        type = t.enum [ "pairing" "allowlist" "open" "disabled" ];
+        type = t.nullOr (t.enum [ "pairing" "allowlist" "open" "disabled" ]);
+        default = null;
       };
       dms = lib.mkOption {
         type = t.nullOr (t.attrsOf (t.submodule { options = {
@@ -3659,7 +3674,8 @@ in
         default = null;
       };
       groupPolicy = lib.mkOption {
-        type = t.enum [ "open" "disabled" "allowlist" ];
+        type = t.nullOr (t.enum [ "open" "disabled" "allowlist" ]);
+        default = null;
       };
       groups = lib.mkOption {
         type = t.nullOr (t.attrsOf (t.submodule { options = {
@@ -3813,7 +3829,8 @@ in
         default = null;
       };
       dmPolicy = lib.mkOption {
-        type = t.enum [ "pairing" "allowlist" "open" "disabled" ];
+        type = t.nullOr (t.enum [ "pairing" "allowlist" "open" "disabled" ]);
+        default = null;
       };
       dms = lib.mkOption {
         type = t.nullOr (t.attrsOf (t.submodule { options = {
@@ -3833,7 +3850,8 @@ in
         default = null;
       };
       groupPolicy = lib.mkOption {
-        type = t.enum [ "open" "disabled" "allowlist" ];
+        type = t.nullOr (t.enum [ "open" "disabled" "allowlist" ]);
+        default = null;
       };
       heartbeat = lib.mkOption {
         type = t.nullOr (t.submodule { options = {
@@ -4074,7 +4092,8 @@ in
           default = null;
         };
         dmPolicy = lib.mkOption {
-          type = t.enum [ "pairing" "allowlist" "open" "disabled" ];
+          type = t.nullOr (t.enum [ "pairing" "allowlist" "open" "disabled" ]);
+          default = null;
         };
         dms = lib.mkOption {
           type = t.nullOr (t.attrsOf (t.submodule { options = {
@@ -4094,7 +4113,8 @@ in
           default = null;
         };
         groupPolicy = lib.mkOption {
-          type = t.enum [ "open" "disabled" "allowlist" ];
+          type = t.nullOr (t.enum [ "open" "disabled" "allowlist" ]);
+          default = null;
         };
         heartbeat = lib.mkOption {
           type = t.nullOr (t.submodule { options = {
@@ -4244,7 +4264,8 @@ in
         default = null;
       };
       dmPolicy = lib.mkOption {
-        type = t.enum [ "pairing" "allowlist" "open" "disabled" ];
+        type = t.nullOr (t.enum [ "pairing" "allowlist" "open" "disabled" ]);
+        default = null;
       };
       dms = lib.mkOption {
         type = t.nullOr (t.attrsOf (t.submodule { options = {
@@ -4264,7 +4285,8 @@ in
         default = null;
       };
       groupPolicy = lib.mkOption {
-        type = t.enum [ "open" "disabled" "allowlist" ];
+        type = t.nullOr (t.enum [ "open" "disabled" "allowlist" ]);
+        default = null;
       };
       heartbeat = lib.mkOption {
         type = t.nullOr (t.submodule { options = {
@@ -4540,7 +4562,8 @@ in
             default = null;
           };
           policy = lib.mkOption {
-            type = t.enum [ "pairing" "allowlist" "open" "disabled" ];
+            type = t.nullOr (t.enum [ "pairing" "allowlist" "open" "disabled" ]);
+            default = null;
           };
           replyToMode = lib.mkOption {
             type = t.nullOr (t.oneOf [ t.enum [ "off" ] t.enum [ "first" ] t.enum [ "all" ] ]);
@@ -4567,7 +4590,8 @@ in
           default = null;
         };
         groupPolicy = lib.mkOption {
-          type = t.enum [ "open" "disabled" "allowlist" ];
+          type = t.nullOr (t.enum [ "open" "disabled" "allowlist" ]);
+          default = null;
         };
         heartbeat = lib.mkOption {
           type = t.nullOr (t.submodule { options = {
@@ -4691,7 +4715,8 @@ in
           default = null;
         };
         userTokenReadOnly = lib.mkOption {
-          type = t.bool;
+          type = t.nullOr (t.bool);
+          default = null;
         };
         webhookPath = lib.mkOption {
           type = t.nullOr (t.str);
@@ -4881,7 +4906,8 @@ in
           default = null;
         };
         policy = lib.mkOption {
-          type = t.enum [ "pairing" "allowlist" "open" "disabled" ];
+          type = t.nullOr (t.enum [ "pairing" "allowlist" "open" "disabled" ]);
+          default = null;
         };
         replyToMode = lib.mkOption {
           type = t.nullOr (t.oneOf [ t.enum [ "off" ] t.enum [ "first" ] t.enum [ "all" ] ]);
@@ -4908,7 +4934,8 @@ in
         default = null;
       };
       groupPolicy = lib.mkOption {
-        type = t.enum [ "open" "disabled" "allowlist" ];
+        type = t.nullOr (t.enum [ "open" "disabled" "allowlist" ]);
+        default = null;
       };
       heartbeat = lib.mkOption {
         type = t.nullOr (t.submodule { options = {
@@ -4945,7 +4972,8 @@ in
         default = null;
       };
       mode = lib.mkOption {
-        type = t.enum [ "socket" "http" ];
+        type = t.nullOr (t.enum [ "socket" "http" ]);
+        default = null;
       };
       name = lib.mkOption {
         type = t.nullOr (t.str);
@@ -5031,10 +5059,12 @@ in
         default = null;
       };
       userTokenReadOnly = lib.mkOption {
-        type = t.bool;
+        type = t.nullOr (t.bool);
+        default = null;
       };
       webhookPath = lib.mkOption {
-        type = t.str;
+        type = t.nullOr (t.str);
+        default = null;
       };
     }; });
       default = null;
@@ -5139,7 +5169,8 @@ in
           default = null;
         };
         dmPolicy = lib.mkOption {
-          type = t.enum [ "pairing" "allowlist" "open" "disabled" ];
+          type = t.nullOr (t.enum [ "pairing" "allowlist" "open" "disabled" ]);
+          default = null;
         };
         dms = lib.mkOption {
           type = t.nullOr (t.attrsOf (t.submodule { options = {
@@ -5176,7 +5207,8 @@ in
           default = null;
         };
         groupPolicy = lib.mkOption {
-          type = t.enum [ "open" "disabled" "allowlist" ];
+          type = t.nullOr (t.enum [ "open" "disabled" "allowlist" ]);
+          default = null;
         };
         groups = lib.mkOption {
           type = t.nullOr (t.attrsOf (t.submodule { options = {
@@ -5351,7 +5383,8 @@ in
           default = null;
         };
         streamMode = lib.mkOption {
-          type = t.enum [ "off" "partial" "block" ];
+          type = t.nullOr (t.enum [ "off" "partial" "block" ]);
+          default = null;
         };
         textChunkLimit = lib.mkOption {
           type = t.nullOr (t.int);
@@ -5476,7 +5509,8 @@ in
         default = null;
       };
       dmPolicy = lib.mkOption {
-        type = t.enum [ "pairing" "allowlist" "open" "disabled" ];
+        type = t.nullOr (t.enum [ "pairing" "allowlist" "open" "disabled" ]);
+        default = null;
       };
       dms = lib.mkOption {
         type = t.nullOr (t.attrsOf (t.submodule { options = {
@@ -5513,7 +5547,8 @@ in
         default = null;
       };
       groupPolicy = lib.mkOption {
-        type = t.enum [ "open" "disabled" "allowlist" ];
+        type = t.nullOr (t.enum [ "open" "disabled" "allowlist" ]);
+        default = null;
       };
       groups = lib.mkOption {
         type = t.nullOr (t.attrsOf (t.submodule { options = {
@@ -5688,7 +5723,8 @@ in
         default = null;
       };
       streamMode = lib.mkOption {
-        type = t.enum [ "off" "partial" "block" ];
+        type = t.nullOr (t.enum [ "off" "partial" "block" ]);
+        default = null;
       };
       textChunkLimit = lib.mkOption {
         type = t.nullOr (t.int);
@@ -5724,14 +5760,16 @@ in
         ackReaction = lib.mkOption {
           type = t.nullOr (t.submodule { options = {
           direct = lib.mkOption {
-            type = t.bool;
+            type = t.nullOr (t.bool);
+            default = null;
           };
           emoji = lib.mkOption {
             type = t.nullOr (t.str);
             default = null;
           };
           group = lib.mkOption {
-            type = t.enum [ "always" "mentions" "never" ];
+            type = t.nullOr (t.enum [ "always" "mentions" "never" ]);
+            default = null;
           };
         }; });
           default = null;
@@ -5778,14 +5816,16 @@ in
           default = null;
         };
         debounceMs = lib.mkOption {
-          type = t.int;
+          type = t.nullOr (t.int);
+          default = null;
         };
         dmHistoryLimit = lib.mkOption {
           type = t.nullOr (t.int);
           default = null;
         };
         dmPolicy = lib.mkOption {
-          type = t.enum [ "pairing" "allowlist" "open" "disabled" ];
+          type = t.nullOr (t.enum [ "pairing" "allowlist" "open" "disabled" ]);
+          default = null;
         };
         dms = lib.mkOption {
           type = t.nullOr (t.attrsOf (t.submodule { options = {
@@ -5805,7 +5845,8 @@ in
           default = null;
         };
         groupPolicy = lib.mkOption {
-          type = t.enum [ "open" "disabled" "allowlist" ];
+          type = t.nullOr (t.enum [ "open" "disabled" "allowlist" ]);
+          default = null;
         };
         groups = lib.mkOption {
           type = t.nullOr (t.attrsOf (t.submodule { options = {
@@ -5910,14 +5951,16 @@ in
       ackReaction = lib.mkOption {
         type = t.nullOr (t.submodule { options = {
         direct = lib.mkOption {
-          type = t.bool;
+          type = t.nullOr (t.bool);
+          default = null;
         };
         emoji = lib.mkOption {
           type = t.nullOr (t.str);
           default = null;
         };
         group = lib.mkOption {
-          type = t.enum [ "always" "mentions" "never" ];
+          type = t.nullOr (t.enum [ "always" "mentions" "never" ]);
+          default = null;
         };
       }; });
         default = null;
@@ -5977,14 +6020,16 @@ in
         default = null;
       };
       debounceMs = lib.mkOption {
-        type = t.int;
+        type = t.nullOr (t.int);
+        default = null;
       };
       dmHistoryLimit = lib.mkOption {
         type = t.nullOr (t.int);
         default = null;
       };
       dmPolicy = lib.mkOption {
-        type = t.enum [ "pairing" "allowlist" "open" "disabled" ];
+        type = t.nullOr (t.enum [ "pairing" "allowlist" "open" "disabled" ]);
+        default = null;
       };
       dms = lib.mkOption {
         type = t.nullOr (t.attrsOf (t.submodule { options = {
@@ -6000,7 +6045,8 @@ in
         default = null;
       };
       groupPolicy = lib.mkOption {
-        type = t.enum [ "open" "disabled" "allowlist" ];
+        type = t.nullOr (t.enum [ "open" "disabled" "allowlist" ]);
+        default = null;
       };
       groups = lib.mkOption {
         type = t.nullOr (t.attrsOf (t.submodule { options = {
@@ -6076,7 +6122,8 @@ in
         default = null;
       };
       mediaMaxMb = lib.mkOption {
-        type = t.int;
+        type = t.nullOr (t.int);
+        default = null;
       };
       messagePrefix = lib.mkOption {
         type = t.nullOr (t.str);
@@ -6102,7 +6149,7 @@ in
   };
 
   commands = lib.mkOption {
-    type = t.submodule { options = {
+    type = t.nullOr (t.submodule { options = {
     bash = lib.mkOption {
       type = t.nullOr (t.bool);
       default = null;
@@ -6120,10 +6167,12 @@ in
       default = null;
     };
     native = lib.mkOption {
-      type = t.oneOf [ t.bool t.enum [ "auto" ] ];
+      type = t.nullOr (t.oneOf [ t.bool t.enum [ "auto" ] ]);
+      default = null;
     };
     nativeSkills = lib.mkOption {
-      type = t.oneOf [ t.bool t.enum [ "auto" ] ];
+      type = t.nullOr (t.oneOf [ t.bool t.enum [ "auto" ] ]);
+      default = null;
     };
     restart = lib.mkOption {
       type = t.nullOr (t.bool);
@@ -6137,7 +6186,8 @@ in
       type = t.nullOr (t.bool);
       default = null;
     };
-  }; };
+  }; });
+    default = null;
   };
 
   cron = lib.mkOption {

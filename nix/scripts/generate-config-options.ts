@@ -223,16 +223,18 @@ const objectTypeForSchema = (schema: JsonSchema, indent: string): string => {
 const renderOption = (key: string, schemaObj: JsonSchema, required: boolean, indent: string): string => {
   const schema = deref(schemaObj, new Set());
   const description = typeof schema.description === "string" ? schema.description : null;
+  const hasSchemaDefault = schema.default !== undefined;
+  const effectiveRequired = required && !hasSchemaDefault;
   const baseTypeExpr = typeForSchema(schema, indent);
   const typeExpr =
-    !required && !baseTypeExpr.startsWith("t.nullOr")
+    !effectiveRequired && !baseTypeExpr.startsWith("t.nullOr")
       ? `t.nullOr (${baseTypeExpr})`
       : baseTypeExpr;
   const lines = [
     `${indent}${nixAttr(key)} = lib.mkOption {`,
     `${indent}  type = ${typeExpr};`,
   ];
-  if (!required) {
+  if (!effectiveRequired) {
     lines.push(`${indent}  default = null;`);
   }
   if (description) {
