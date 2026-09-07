@@ -43,6 +43,9 @@ buildNpmPackageForOpenClaw {
 
   env = {
     NODE_BIN = "${nodejs_22}/bin/node";
+    # stdenv unpacks the directory source under its hash-stripped store name;
+    # postUnpack runs in the build root before stdenv enters it.
+    OPENCLAW_NPM_WRAPPER_DIR = baseNameOf wrapperSrc;
     OPENCLAW_BUNDLED_ACPX = "${bundledAcpx}";
     OPENCLAW_NPM_PACKAGE_ROOT = "node_modules/openclaw";
     OPENCLAW_PATCH_NPM_DIST_SCRIPT = "${../scripts/patch-openclaw-npm-dist.mjs}";
