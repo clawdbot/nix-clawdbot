@@ -12,6 +12,7 @@ Older repository history is available in git.
 
 **Highlights:** Nix-managed skills remain discoverable with OpenClaw’s hardlink checks, and Home Manager activation handles paths and cleanup more reliably. Changes below cover the package state since `v2026.7.1`.
 
+- Regenerate the gateway npm wrapper lock from scratch on every stable pin refresh and validate it offline before `npm ci`; updating the previous release's lock in place left OpenClaw 2026.9.x without its hoisted `p-limit@7` dependency and failed the Nix gateway build with ENOTCACHED (2026-09-07).
 - Materialize configured user and plugin skills as per-instance runtime copies, preserving all-agent discovery, extra load paths, and cleanup boundaries; thanks @vsumner (#118).
 - Support packaging OpenClaw 2026.8.1+ lockless runtime plugins once upstream ships npm package-lock release evidence, with dependencies bound to the pinned release SHA (2026-09-06).
 - Fix Home Manager config symlink activation and systemd environment quoting for paths containing spaces, while preserving home-relative `~/` symlink destinations; thanks @SebTardif (#122).

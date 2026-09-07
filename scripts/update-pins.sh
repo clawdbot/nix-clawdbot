@@ -95,10 +95,19 @@ refresh_npm_wrapper_locks() {
 
   update_wrapper_package_version "$gateway_npm_wrapper_dir/package.json" "openclaw" "$source_version"
 
-  rm -rf "$gateway_npm_wrapper_dir/node_modules"
+  # Resolve the wrapper lock from scratch. Updating the previous release's lock
+  # in place lets npm (10 and 11) keep a stale nested transitive package, such
+  # as openclaw/node_modules/p-limit@2.x, as the target of a new direct
+  # dependency edge (openclaw -> p-limit@^7) and drop the hoisted package, which
+  # then fails `npm ci` with ENOTCACHED inside the Nix sandbox.
+  rm -rf "$gateway_npm_wrapper_dir/node_modules" "$gateway_npm_wrapper_dir/package-lock.json"
   nix shell --extra-experimental-features "nix-command flakes" --accept-flake-config --inputs-from "$repo_root" \
     nixpkgs#nodejs_22 -c \
     bash -euo pipefail -c "cd '$gateway_npm_wrapper_dir' && npm install --package-lock-only --ignore-scripts --omit=dev --legacy-peer-deps"
+  OPENCLAW_NPM_WRAPPER_DIR="$gateway_npm_wrapper_dir" \
+    nix shell --extra-experimental-features "nix-command flakes" --accept-flake-config --inputs-from "$repo_root" \
+    nixpkgs#nodejs_22 -c \
+    "$repo_root/nix/scripts/check-openclaw-npm-wrapper-lock.sh"
 }
 
 refresh_runtime_plugin_locks() {
