@@ -460,10 +460,10 @@ let
   userSkillCheck = builtins.deepSeq (requireNoAssertionFailures "user skills" userSkillEval) (
     if !(lib.elem "/tmp/user-skill-root" userSkillExtraDirs) then
       throw "User skills.load.extraDirs entry was not preserved."
-    else if generatedUserSkillExtraDirs != [
-      "/tmp/.local/share/nix-openclaw/skills/default/inline-skill"
-    ] then
+    else if !(lib.elem "/tmp/.local/share/nix-openclaw/skills/default/inline-skill" generatedUserSkillExtraDirs) then
       throw "Nix-managed raw skill did not use its per-instance runtime copy."
+    else if !(lib.all (lib.hasPrefix "/tmp/.local/share/nix-openclaw/skills/default/") generatedUserSkillExtraDirs) then
+      throw "A default plugin skill escaped the instance runtime root."
     else if userSkillExtraDirs != generatedUserSkillExtraDirs ++ [ "/tmp/user-skill-root" ] then
       throw "User skills.load.extraDirs entries should remain after Nix-managed skill dirs."
     else
@@ -493,7 +493,7 @@ let
     "test"
   ];
   namedSkillCheck = builtins.deepSeq (requireNoAssertionFailures "named instance skills" namedSkillEval) (
-    if map (value: value.skills.load.extraDirs) namedSkillConfigs != [
+    if map (value: lib.filter (lib.hasSuffix "/inline-skill") value.skills.load.extraDirs) namedSkillConfigs != [
       [ "/tmp/.local/share/nix-openclaw/skills/prod/inline-skill" ]
       [ "/tmp/.local/share/nix-openclaw/skills/test/inline-skill" ]
     ] then
@@ -507,7 +507,7 @@ let
   };
   caseSkillConfig = generatedConfig caseSkillEval ".openclaw/openclaw.json";
   caseSkillCheck =
-    if lib.length (lib.unique (map lib.toLower caseSkillConfig.skills.load.extraDirs)) != 2 then
+    if lib.length (lib.unique (map lib.toLower caseSkillConfig.skills.load.extraDirs)) != lib.length caseSkillConfig.skills.load.extraDirs then
       throw "Case-distinct skills collide on case-insensitive home filesystems."
     else
       "ok";
