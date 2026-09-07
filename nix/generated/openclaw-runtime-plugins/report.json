@@ -1177,7 +1177,7 @@
       "expectedIntegrity": "sha512-3GD+mf3EjTSUTOAREjTHAyp/deXdpgqB+q+xE0b19Qtat4ADhUV1mHDwFkVCRqTCBY5ATFKtKcipoDejqFj/+w==",
       "status": "skipped",
       "reason": "runtime-dependencies-without-shrinkwrap",
-      "detail": "package has runtime dependencies but no npm-shrinkwrap.json or bundled node_modules"
+      "detail": "package has runtime dependencies but no npm-shrinkwrap.json, bundled node_modules, or upstream npm package-lock evidence"
     },
     {
       "id": "openclaw-weixin",
@@ -1193,7 +1193,7 @@
       "expectedIntegrity": "sha512-qw9k3PLTiMWGNjjsknHgcTManH1w4j+Ji1ArWIaYLKCq3aFRsVwcqnPi127bvOoVMJGW4dbyJ8NECEMgoO+iRw==",
       "status": "skipped",
       "reason": "runtime-dependencies-without-shrinkwrap",
-      "detail": "package has runtime dependencies but no npm-shrinkwrap.json or bundled node_modules"
+      "detail": "package has runtime dependencies but no npm-shrinkwrap.json, bundled node_modules, or upstream npm package-lock evidence"
     },
     {
       "id": "openclaw-zaloclawbot",
@@ -1209,7 +1209,7 @@
       "expectedIntegrity": "sha512-5IxZriHJYACLLGqkCPPsTP9tas62kXEOFqTFAFMdunAM3SPhIJwVFRp0WvoP/m7L2PX85weD0g8LOtxM93VDYg==",
       "status": "skipped",
       "reason": "runtime-dependencies-without-shrinkwrap",
-      "detail": "package has runtime dependencies but no npm-shrinkwrap.json or bundled node_modules"
+      "detail": "package has runtime dependencies but no npm-shrinkwrap.json, bundled node_modules, or upstream npm package-lock evidence"
     },
     {
       "id": "wecom-openclaw-plugin",
@@ -1224,7 +1224,7 @@
       "expectedIntegrity": "sha512-TCkP9as00WfEhgFWG8YL/rcmaWGIshAki2HQh83nTRccGfVBCoGjrEboTTqq3yDmK9koWTV11zi8u8A4dNtvug==",
       "status": "skipped",
       "reason": "runtime-dependencies-without-shrinkwrap",
-      "detail": "package has runtime dependencies but no npm-shrinkwrap.json or bundled node_modules"
+      "detail": "package has runtime dependencies but no npm-shrinkwrap.json, bundled node_modules, or upstream npm package-lock evidence"
     },
     {
       "id": "pixverse",
