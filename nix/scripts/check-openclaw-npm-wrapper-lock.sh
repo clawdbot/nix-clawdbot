@@ -12,7 +12,9 @@
 # committed lock as-is, so a lock npm silently repairs offline is not proven.
 set -eu
 
-wrapper_dir="${OPENCLAW_NPM_WRAPPER_DIR:-$PWD}"
+# As a stdenv postUnpack hook the cwd is still the build root; stdenv exposes
+# the unpacked wrapper source as $sourceRoot before the hook runs.
+wrapper_dir="${OPENCLAW_NPM_WRAPPER_DIR:-${sourceRoot:-$PWD}}"
 lock_file="$wrapper_dir/package-lock.json"
 
 if [ ! -f "$wrapper_dir/package.json" ] || [ ! -f "$lock_file" ]; then

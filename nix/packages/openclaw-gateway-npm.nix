@@ -51,7 +51,9 @@ buildNpmPackageForOpenClaw {
 
   # Validate the wrapper lock before npmConfigHook runs `npm ci` in postPatch,
   # so an incomplete lock fails with the offending edge instead of ENOTCACHED.
-  prePatch = "${../scripts/check-openclaw-npm-wrapper-lock.sh}";
+  # postUnpack, not prePatch: buildNpmPackage forwards prePatch/postPatch into
+  # its fetchNpmDeps derivation, which has no npm on PATH.
+  postUnpack = "${../scripts/check-openclaw-npm-wrapper-lock.sh}";
   installPhase = "${../scripts/openclaw-gateway-npm-install.sh}";
 
   dontFixup = true;
