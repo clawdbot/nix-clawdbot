@@ -7,11 +7,11 @@
 
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "pnpm";
-  version = "11.25.0";
+  version = "11.26.0";
 
   src = fetchurl {
     url = "https://registry.npmjs.org/pnpm/-/pnpm-${finalAttrs.version}.tgz";
-    hash = "sha256-M90HSPJ+eRbE8ci2lDRhmD40U7BrvaYxKmKAEwtIgeU=";
+    hash = "sha256-wzIgfnOPhLfM+V1fIfb98QsNxbEz8KNJg0om/RerrNg=";
   };
 
   preConfigure = ''

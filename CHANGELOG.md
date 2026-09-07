@@ -10,12 +10,13 @@ Older repository history is available in git.
 
 ## Unreleased
 
-**Highlights:** More reliable Home Manager activation and isolated, updated package-manager tooling. Changes below cover the package state since `v2026.7.1`.
+**Highlights:** Nix-managed skills remain discoverable with OpenClaw’s hardlink checks, and Home Manager activation handles paths and cleanup more reliably. Changes below cover the package state since `v2026.7.1`.
 
+- Materialize configured user and plugin skills as per-instance runtime copies, preserving all-agent discovery, extra load paths, and cleanup boundaries; thanks @vsumner (#118).
 - Support packaging OpenClaw 2026.8.1+ lockless runtime plugins once upstream ships npm package-lock release evidence, with dependencies bound to the pinned release SHA (2026-09-06).
 - Fix Home Manager config symlink activation and systemd environment quoting for paths containing spaces, while preserving home-relative `~/` symlink destinations; thanks @SebTardif (#122).
 - Constrain workspace cleanup and replacement to configured roots, preserve stale paths from removed or moved instances with a warning, avoid changing symlink targets or hardlinked file permissions, and create home-relative workspace paths containing spaces correctly; thanks @SebTardif (#119, #120).
-- Keep OpenClaw's private pnpm tools out of the consumer Nixpkgs overlay, support pnpm 12 releases, update the private runtimes to pnpm 11.25.0 and 12.3.4, and fix the pnpm 12 Linux executable's loader and runtime libraries; thanks @jerome-benoit (#116, #117, #121).
+- Keep OpenClaw's private pnpm tools out of the consumer Nixpkgs overlay, support pnpm 12 releases, update the private runtimes to pnpm 11.26.0 and 12.3.4, and fix the pnpm 12 Linux executable's loader and runtime libraries; thanks @jerome-benoit (#116, #117, #121).
 - Restart the configured launchd labels and systemd user units with `openclaw-reload` instead of the old hardcoded labels.
 - Package upstream OpenClaw `2026.7.1-2`, retain runtime plugin version `2026.7.1` for correction releases, and repair the macOS `2026.7.1` app artifact hash; thanks @vincentkoc.
 - Preserve canonical scoped npm package encoding and fully escape generated CI table cells; thanks @vincentkoc (#114).
