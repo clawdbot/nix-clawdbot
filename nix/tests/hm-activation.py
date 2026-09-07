@@ -1,3 +1,4 @@
+import json
 import shlex
 
 start_all()
@@ -22,6 +23,16 @@ machine.succeed(f"grep -q 'BEGIN NIX-REPORT' {workspace}/TOOLS.md")
 machine.wait_until_succeeds(
     "test -x /home/alice/.openclaw/agents/main/agent/codex-home/home/.nix-profile/bin/jq"
 )
+
+skill_root = "/home/alice/.local/share/nix-openclaw/skills/default"
+for skill in ["activation-skill", "copied-skill"]:
+    machine.succeed(f"test -f {skill_root}/{skill}/SKILL.md")
+machine.succeed(f'test -z "$(find {skill_root} -type l -print)"')
+machine.succeed(f'test -z "$(find {skill_root} -type f ! -links 1 -print)"')
+machine.succeed(f'test -z "$(find {skill_root} -type f ! -user alice -print)"')
+skills_command = f"OPENCLAW_CONFIG_PATH={config_path} openclaw skills list --json"
+skills_output = machine.succeed(f"su - alice -c {shlex.quote(skills_command)}")
+assert {"activation-skill", "skill"} <= {entry["name"] for entry in json.loads(skills_output)["skills"]}
 
 uid = machine.succeed("id -u alice").strip()
 machine.succeed("loginctl enable-linger alice")

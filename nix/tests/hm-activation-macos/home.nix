@@ -15,6 +15,18 @@
   programs.openclaw = {
     enable = true;
     installApp = false;
+    skills = [
+      {
+        name = "activation-skill";
+        mode = "inline";
+        description = "Synthetic activation fixture";
+      }
+      {
+        name = "copied-skill";
+        mode = "copy";
+        source = toString ../plugins/alpha/skill;
+      }
+    ];
     workspace.files."LORE.md" = ../workspace/LORE.md;
     runtimePackages = [ pkgs.jq ];
     environment.OPENCLAW_TEST_SECRET = "/tmp/openclaw-secret";

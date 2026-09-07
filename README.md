@@ -469,11 +469,21 @@ When you run `home-manager switch`:
    - What CLI packages to install
    - What skill directories to expose
    - What environment variables it needs
-3. Tools go on the gateway PATH, skills are added to OpenClaw's `skills.load.extraDirs`
+3. Tools go on the gateway PATH. Activation copies Nix-managed skills to per-instance runtime directories and adds those directories to OpenClaw's `skills.load.extraDirs`.
 4. A launchd (macOS) or systemd user service (Linux) is created/updated to run the gateway
 5. The gateway starts, loads skills, connects to your providers
 
-All state lives in `~/.openclaw/`. Logs at `/tmp/openclaw/openclaw-gateway.log`.
+Gateway state defaults to `~/.openclaw/`. Logs are at `/tmp/openclaw/openclaw-gateway.log`.
+
+Nix remains the source of truth for configured user and plugin skills. Activation
+copies them into `~/.local/share/nix-openclaw/skills/<instance>/<skill>` so
+OpenClaw can read user-owned files with one hard link, even when the Nix store
+is deduplicated. Some directory names are encoded to keep instances and skills distinct across filesystems.
+All agents in an instance share these load paths; user-supplied
+`skills.load.extraDirs` stay unchanged. Activation refreshes copies on upgrades
+and rollbacks, and removes undeclared skills only within currently enabled
+instance roots. State from removed instances is preserved with a warning.
+Treat these copies as Nix-managed: edit the declared source and rebuild.
 
 </details>
 

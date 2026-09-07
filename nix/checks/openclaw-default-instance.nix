@@ -151,7 +151,7 @@ let
     in
     qmdPath != "";
   isPluginSkillPath =
-    path: lib.hasSuffix "/skill" path || lib.hasSuffix "-openclaw-plugin-skill-skill" path;
+    path: path == "/tmp/.local/share/nix-openclaw/skills/default/skill";
 
   defaultEval = moduleEval { };
   defaultConfig = generatedConfig defaultEval ".openclaw/openclaw.json";
@@ -460,13 +460,57 @@ let
   userSkillCheck = builtins.deepSeq (requireNoAssertionFailures "user skills" userSkillEval) (
     if !(lib.elem "/tmp/user-skill-root" userSkillExtraDirs) then
       throw "User skills.load.extraDirs entry was not preserved."
-    else if generatedUserSkillExtraDirs == [ ] then
-      throw "Nix-managed raw skill was not added to skills.load.extraDirs."
+    else if generatedUserSkillExtraDirs != [
+      "/tmp/.local/share/nix-openclaw/skills/default/inline-skill"
+    ] then
+      throw "Nix-managed raw skill did not use its per-instance runtime copy."
     else if userSkillExtraDirs != generatedUserSkillExtraDirs ++ [ "/tmp/user-skill-root" ] then
       throw "User skills.load.extraDirs entries should remain after Nix-managed skill dirs."
     else
       "ok"
   );
+
+  namedSkillEval = moduleEval {
+    skills = [
+      {
+        name = "inline-skill";
+        mode = "inline";
+      }
+    ];
+    instances = {
+      prod = {
+        enable = true;
+        appDefaults.enable = false;
+      };
+      test = {
+        enable = true;
+        appDefaults.enable = false;
+      };
+    };
+  };
+  namedSkillConfigs = map (name: generatedConfig namedSkillEval ".openclaw-${name}/openclaw.json") [
+    "prod"
+    "test"
+  ];
+  namedSkillCheck = builtins.deepSeq (requireNoAssertionFailures "named instance skills" namedSkillEval) (
+    if map (value: value.skills.load.extraDirs) namedSkillConfigs != [
+      [ "/tmp/.local/share/nix-openclaw/skills/prod/inline-skill" ]
+      [ "/tmp/.local/share/nix-openclaw/skills/test/inline-skill" ]
+    ] then
+      throw "Named instances did not isolate their runtime skill copies."
+    else
+      "ok"
+  );
+
+  caseSkillEval = moduleEval {
+    skills = map (name: { inherit name; mode = "inline"; }) [ "Case" "case" ];
+  };
+  caseSkillConfig = generatedConfig caseSkillEval ".openclaw/openclaw.json";
+  caseSkillCheck =
+    if lib.length (lib.unique (map lib.toLower caseSkillConfig.skills.load.extraDirs)) != 2 then
+      throw "Case-distinct skills collide on case-insensitive home filesystems."
+    else
+      "ok";
 
   bootstrapFiles = {
     agents = ../tests/workspace/AGENTS.md;
@@ -1012,6 +1056,8 @@ let
       reloadNamedCheck
       reloadCustomDefaultCheck
       userSkillCheck
+      namedSkillCheck
+      caseSkillCheck
       workspaceBootstrapCheck
       documentsRemovedCheck
       bootstrapSeedConflictCheck

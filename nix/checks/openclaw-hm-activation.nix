@@ -53,6 +53,18 @@ pkgs.testers.nixosTest {
                 };
                 files."LORE.md" = ../tests/workspace/LORE.md;
               };
+              skills = [
+                {
+                  name = "activation-skill";
+                  mode = "inline";
+                  description = "Synthetic activation fixture";
+                }
+                {
+                  name = "copied-skill";
+                  mode = "copy";
+                  source = toString ../tests/plugins/alpha/skill;
+                }
+              ];
               installApp = false;
               launchd.enable = false;
               instances.default = {

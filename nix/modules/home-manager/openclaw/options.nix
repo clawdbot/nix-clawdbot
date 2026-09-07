@@ -135,7 +135,7 @@ let
           "inline"
         ];
         default = "symlink";
-        description = "Skill source mode. inline renders body; symlink/copy import source as a Nix store skill directory and expose it through skills.load.extraDirs.";
+        description = "Skill source mode. inline renders body; symlink/copy import source into the Nix store. Activation copies every mode to a per-instance runtime directory exposed through skills.load.extraDirs.";
       };
       source = lib.mkOption {
         type = lib.types.nullOr lib.types.str;

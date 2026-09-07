@@ -69,6 +69,15 @@ let
       plugins
       ;
   };
+  skills = import ./skills.nix {
+    inherit
+      lib
+      pkgs
+      openclawLib
+      enabledInstances
+      plugins
+      ;
+  };
   runtimePlugins = import ./runtime-plugins.nix { inherit lib pkgs; };
 
   stripNulls =
@@ -135,7 +144,7 @@ let
           plugin = "runtime";
         }) (cfg.environment // inst.environment));
       userConfig = stripNulls (lib.recursiveUpdate (stripNulls cfg.config) (stripNulls inst.config));
-      nixSkillLoadDirs = files.skillLoadDirsForInstance name;
+      nixSkillLoadDirs = skills.skillLoadDirsForInstance name;
       mergedConfigWithoutLoadPaths = stripNulls (lib.recursiveUpdate baseConfig userConfig);
       existingOpenClawPluginLoadPaths = (
         ((mergedConfigWithoutLoadPaths.plugins or { }).load or { }).paths or [ ]
@@ -468,7 +477,7 @@ in
       }
     ]
     ++ files.workspaceAssertions
-    ++ files.duplicateSkillAssertion
+    ++ skills.duplicateSkillAssertion
     ++ plugins.pluginAssertions
     ++ lib.flatten (map (item: item.assertions) instanceConfigs)
     ++ [
@@ -515,6 +524,13 @@ in
 
     home.activation.openclawWorkspaceFiles = lib.hm.dag.entryAfter [ "openclawDirs" ] ''
       run --quiet ${../openclaw-materialize-workspace-files.sh} ${lib.escapeShellArg "${homeDir}/.local/state/nix-openclaw/managed-workspace-files"} ${files.materializedManifest} ${files.workspaceRootsManifest}
+    '';
+
+    home.activation.openclawSkills = lib.hm.dag.entryAfter [ "openclawDirs" ] ''
+      ${lib.optionalString (skills.roots != [ ])
+        "run --quiet ${lib.getExe' pkgs.coreutils "mkdir"} -p -- ${lib.escapeShellArgs skills.roots}"
+      }
+      run --quiet ${../openclaw-materialize-workspace-files.sh} ${lib.escapeShellArg "${homeDir}/.local/state/nix-openclaw/managed-skill-files"} ${skills.materializedManifest} ${skills.rootsManifest}
     '';
 
     home.activation.openclawConfigFiles = lib.hm.dag.entryAfter [ "openclawDirs" ] ''

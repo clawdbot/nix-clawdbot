@@ -133,7 +133,7 @@ Do not add raw npm package names to `runtimePlugins`, host config load paths, or
 - Worktree: build and test plugins outside the core repo; point OpenClaw at a local path source during impure local dev (e.g., `source = "path:/Users/you/code/my-plugin"`). Committed config uses pinned refs.
 - Rebuild loop: change plugin → `home-manager switch` (or host-equivalent) → gateway restarts with new PATH/skills/config; no manual copying.
 - Name collisions: use the same plugin `name` to override a pinned version (last entry wins); keep unique names otherwise to avoid surprise overrides.
-- Skills placement: skills stay in immutable Nix/plugin paths and are wired through `skills.load.extraDirs`, so every agent workspace in that instance can discover them.
+- Skills placement: immutable Nix/plugin paths remain the inputs. Activation creates per-instance, user-owned runtime copies under `~/.local/share/nix-openclaw/skills` and wires them through `skills.load.extraDirs`, so every agent workspace in that instance can discover them without relaxing upstream hardlink checks.
 - Env guardrails: required env vars must point to files (non-empty) or the activation fails—supply temp files during dev to exercise the checks.
 - Settings JSON: inspect the rendered `config.json` in the first `stateDir` to confirm schema and defaults before committing.
 

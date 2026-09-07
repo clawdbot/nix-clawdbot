@@ -49,6 +49,14 @@ test -f "$plist"
 test -L "$HOME/.openclaw/agents/main/agent/codex-home/home/.nix-profile/bin"
 test -x "$HOME/.openclaw/agents/main/agent/codex-home/home/.nix-profile/bin/jq"
 
+skill_root="$HOME/.local/share/nix-openclaw/skills/default"
+for skill in activation-skill copied-skill; do
+  test -f "$skill_root/$skill/SKILL.md"
+done
+test -z "$(find "$skill_root" -type l -print)"
+test -z "$(find "$skill_root" -type f ! -links 1 -print)"
+test -z "$(find "$skill_root" -type f ! -user "$(id -un)" -print)"
+
 if command -v launchctl >/dev/null 2>&1; then
   state_file="$home_dir/launchd-state.txt"
   running=false
@@ -71,6 +79,9 @@ if command -v launchctl >/dev/null 2>&1; then
     openclaw_bin=${openclaw_bin%% gateway*}
   fi
   grep -q OPENCLAW_TEST_SECRET "$openclaw_bin"
+  "$openclaw_bin" skills list --json > "$home_dir/skills.json"
+  grep -Eq '"name"[[:space:]]*:[[:space:]]*"activation-skill"' "$home_dir/skills.json"
+  grep -Eq '"name"[[:space:]]*:[[:space:]]*"skill"' "$home_dir/skills.json"
   health_file="$home_dir/gateway-health.json"
   healthy=false
   for _ in {1..30}; do
