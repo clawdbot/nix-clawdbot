@@ -79,7 +79,8 @@ if command -v launchctl >/dev/null 2>&1; then
     openclaw_bin=${openclaw_bin%% gateway*}
   fi
   grep -q OPENCLAW_TEST_SECRET "$openclaw_bin"
-  "$openclaw_bin" skills list --json > "$home_dir/skills.json"
+  OPENCLAW_CONFIG_PATH="$HOME/.openclaw/config with spaces and 'quotes'.json" \
+    "$openclaw_bin" skills list --json > "$home_dir/skills.json"
   grep -Eq '"name"[[:space:]]*:[[:space:]]*"activation-skill"' "$home_dir/skills.json"
   grep -Eq '"name"[[:space:]]*:[[:space:]]*"skill"' "$home_dir/skills.json"
   health_file="$home_dir/gateway-health.json"
