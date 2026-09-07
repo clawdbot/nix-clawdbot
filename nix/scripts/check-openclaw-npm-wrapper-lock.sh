@@ -7,7 +7,9 @@
 # against the registry, which surfaces later as an opaque ENOTCACHED inside the
 # Nix sandbox. Running the same resolver offline against an empty cache, in a
 # scratch copy, fails on exactly those edges while still accepting subtrees that
-# upstream pins through npm-shrinkwrap.json (which npm never re-resolves).
+# upstream pins through npm-shrinkwrap.json (which npm never re-resolves). The
+# scratch lock must also come back byte-identical: `npm ci` consumes the
+# committed lock as-is, so a lock npm silently repairs offline is not proven.
 set -eu
 
 wrapper_dir="${OPENCLAW_NPM_WRAPPER_DIR:-$PWD}"
@@ -45,7 +47,11 @@ if ! (cd "$scratch/work" && npm install --package-lock-only --ignore-scripts --o
   echo "Regenerate it from scratch with scripts/update-pins.sh; never update the stale lock in place." >&2
   exit 1
 fi
+# A lock npm has to repair offline (for example a root entry that drifted from
+# package.json) is not the lock `npm ci` will consume, so a rewrite fails too.
 if ! cmp -s "$lock_file" "$scratch/work/package-lock.json"; then
-  echo "warning: npm rewrote the wrapper lock offline; the committed lock is not npm's settled tree for this npm version" >&2
+  echo "npm rewrote the wrapper package-lock.json offline; the committed lock is not npm's settled tree: $lock_file" >&2
+  echo "Regenerate it from scratch with scripts/update-pins.sh; never update the stale lock in place." >&2
+  exit 1
 fi
 echo "openclaw npm wrapper lock: ok"

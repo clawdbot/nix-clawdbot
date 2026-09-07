@@ -28,6 +28,8 @@ function writeWrapper(packages) {
     dependencies: { openclaw: "2.0.0" },
   };
   fs.writeFileSync(path.join(dir, "package.json"), `${JSON.stringify(root, null, 2)}\n`);
+  // npm's own lock omits `private` from the root entry.
+  const { private: _private, ...lockRoot } = root;
   fs.writeFileSync(
     path.join(dir, "package-lock.json"),
     `${JSON.stringify({
@@ -35,7 +37,7 @@ function writeWrapper(packages) {
       version: root.version,
       lockfileVersion: 3,
       requires: true,
-      packages: { "": root, ...packages },
+      packages: { "": lockRoot, ...packages },
     }, null, 2)}\n`,
   );
   return dir;
@@ -96,6 +98,22 @@ test("a lock missing a runtime dependency entirely fails", () => {
   assert.equal(result.status, 1);
   assert.match(result.stderr, /ENOTCACHED/);
   assert.match(result.stderr, /registry\.npmjs\.org\/p-locate/);
+});
+
+test("a lock npm can only accept by rewriting it offline fails", () => {
+  // The root entry drifted from package.json (openclaw 1.0.0 vs 2.0.0) while
+  // the locked package already satisfies it: npm repairs the scratch copy
+  // without the registry, but `npm ci` would consume the unrepaired lock.
+  const result = runCheck(writeWrapper({
+    "": {
+      name: "nix-openclaw-openclaw-wrapper",
+      version: "0.0.0",
+      dependencies: { openclaw: "1.0.0" },
+    },
+    "node_modules/openclaw": locked("openclaw", "2.0.0"),
+  }));
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /rewrote the wrapper package-lock\.json offline/);
 });
 
 test("a wrapper directory without a lock fails before invoking npm", () => {
