@@ -10,11 +10,12 @@ Older repository history is available in git.
 
 ## Unreleased
 
-**Highlights:** Nix-managed skills remain discoverable with OpenClaw’s hardlink checks, and Home Manager activation handles paths and cleanup more reliably. Changes below cover the package state since `v2026.7.1`.
+**Highlights:** Nix-managed skills remain discoverable with OpenClaw’s hardlink checks, and documented home-relative paths work consistently across Home Manager activation and gateway services. Changes below cover the package state since `v2026.7.1`.
 
-- Regenerate the gateway npm wrapper lock from scratch on every stable pin refresh and validate it offline before `npm ci`; updating the previous release's lock in place left OpenClaw 2026.9.x without its hoisted `p-limit@7` dependency and failed the Nix gateway build with ENOTCACHED (2026-09-07).
 - Materialize configured user and plugin skills as per-instance runtime copies, preserving all-agent discovery, extra load paths, and cleanup boundaries; thanks @vsumner (#118).
+- Resolve leading `~/` in instance state, workspace, and config paths consistently for managed files, runtime profiles, and launchd/systemd services, including paths containing spaces and quotes; thanks @SebTardif (#130).
 - Support packaging OpenClaw 2026.8.1+ lockless runtime plugins once upstream ships npm package-lock release evidence, with dependencies bound to the pinned release SHA (2026-09-06).
+- Regenerate the gateway npm wrapper lock from scratch on every stable pin refresh and validate it offline before `npm ci`; updating the previous release's lock in place left OpenClaw 2026.9.x without its hoisted `p-limit@7` dependency and failed the Nix gateway build with ENOTCACHED (2026-09-07).
 - Fix Home Manager config symlink activation and systemd environment quoting for paths containing spaces, while preserving home-relative `~/` symlink destinations; thanks @SebTardif (#122).
 - Constrain workspace cleanup and replacement to configured roots, preserve stale paths from removed or moved instances with a warning, avoid changing symlink targets or hardlinked file permissions, and create home-relative workspace paths containing spaces correctly; thanks @SebTardif (#119, #120).
 - Keep OpenClaw's private pnpm tools out of the consumer Nixpkgs overlay, support pnpm 12 releases, update the private runtimes to pnpm 11.26.0 and 12.3.4, and fix the pnpm 12 Linux executable's loader and runtime libraries; thanks @jerome-benoit (#116, #117, #121).
