@@ -35,13 +35,19 @@ let
     if usesAgentEntries then
       let
         keys = lib.attrNames (agents.entries or { });
-        normalized = map lib.toLower keys;
+        # Only underscore-prefixed valid keys take upstream's trailing-dash fallback.
+        normalized = map (
+          key:
+          lib.toLower (
+            if lib.hasPrefix "_" key then builtins.head (builtins.match "(.*[^-])-*" key) else key
+          )
+        ) keys;
       in
       # Generated options omit upstream key patterns; validate before forming paths.
       if lib.any (key: builtins.match "[a-zA-Z0-9_][a-zA-Z0-9_-]{0,63}" key == null) keys then
         throw "OpenClaw agents.entries keys must match the upstream agent ID alphabet and 1-64 character limit."
       else if lib.length (lib.unique normalized) != lib.length normalized then
-        throw "OpenClaw agents.entries keys must be unique after lowercase normalization."
+        throw "OpenClaw agents.entries keys must be unique after canonical agent ID normalization."
       else
         normalized
     else

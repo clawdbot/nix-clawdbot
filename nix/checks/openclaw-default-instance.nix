@@ -165,7 +165,10 @@ let
   defaultConfig = generatedConfig defaultEval ".openclaw/openclaw.json";
   hasLinuxUnit = builtins.hasAttr "openclaw-gateway" defaultEval.config.systemd.user.services;
   hasDarwinAgent = builtins.hasAttr "com.steipete.openclaw.gateway" defaultEval.config.launchd.agents;
-  defaultCheck = builtins.deepSeq (requireNoAssertionFailures "default instance" defaultEval) (
+  defaultCheck = builtins.deepSeq [
+    (requireNoAssertionFailures "default instance" defaultEval)
+    defaultEval.config.home.activation
+  ] (
     if pkgs.stdenv.hostPlatform.isLinux && !hasLinuxUnit then
       throw "Default OpenClaw instance missing systemd.unitName."
     else if pkgs.stdenv.hostPlatform.isDarwin && !hasDarwinAgent then
