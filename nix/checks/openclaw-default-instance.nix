@@ -270,6 +270,11 @@ let
     { entries."_" = { }; expected = [ "_" ]; }
     { entries."__" = { }; expected = [ "__" ]; }
     { entries."_--" = { }; expected = [ "_" ]; }
+    { entries."_-" = { }; expected = [ "_" ]; }
+    { entries."__--" = { }; expected = [ "__" ]; }
+    { entries."_A-B--" = { }; expected = [ "_a-b" ]; }
+    { entries = { worker = { }; "worker-" = { }; }; expected = [ "worker" "worker-" ]; }
+    { entries."_${lib.concatStrings (lib.replicate 63 "-")}" = { }; expected = [ "_" ]; }
     { entries.Writer = { }; expected = [ "writer" ]; }
     { entries."0--" = { }; expected = [ "0--" ]; }
     { entries = { a = { }; "a--" = { }; }; expected = [ "a" "a--" ]; }
