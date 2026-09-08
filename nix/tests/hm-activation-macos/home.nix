@@ -72,7 +72,7 @@ in
       config.agents =
         if openclawLib.usesAgentEntries then
           lib.optionalAttrs openclawLib.hasAgentOwnership { ownership = "explicit"; }
-          // { entries = { Writer = { }; research = { }; }; }
+          // { entries = { Writer = { }; research = { }; "_worker--" = { }; "a--" = { }; }; }
         else
           { list = [ { id = "writer"; } { id = "research"; } ]; };
     };

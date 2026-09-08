@@ -56,10 +56,10 @@ jq_bin="$HOME/openclaw state/agents/main/agent/codex-home/home/.nix-profile/bin/
 implicit_root="$HOME/.openclaw-implicit"
 roster_root="$HOME/.openclaw-roster"
 if "$jq_bin" -e '.agents | has("entries")' "$roster_root/openclaw.json" >/dev/null; then
-  "$jq_bin" -e '.agents.entries == {"Writer": {}, "research": {}}' "$roster_root/openclaw.json"
+  "$jq_bin" -e '.agents.entries == {"Writer": {}, "research": {}, "_worker--": {}, "a--": {}}' "$roster_root/openclaw.json"
   "$jq_bin" -e '.agents.entries == {"main": {}}' "$config_path"
   "$jq_bin" -e '.agents == {"entries": {"main": {}}}' "$implicit_root/openclaw.json"
-  expected_ids=(research writer)
+  expected_ids=(_worker a-- research writer)
 else
   "$jq_bin" -e '.agents.list == [{"id": "writer"}, {"id": "research"}]' "$roster_root/openclaw.json"
   "$jq_bin" -e 'has("agents") | not' "$implicit_root/openclaw.json"

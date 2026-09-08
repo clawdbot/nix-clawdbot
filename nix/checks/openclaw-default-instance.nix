@@ -259,6 +259,39 @@ let
     )
   ) authoredRosterCases);
 
+  # Upstream trims trailing hyphens on its underscore-prefixed fallback,
+  # while alphanumeric IDs retain them through the valid-ID fast path.
+  canonicalAgentIdCases = [
+    { entries."_worker--" = { }; expected = [ "_worker" ]; }
+    { entries."_worker-" = { }; expected = [ "_worker" ]; }
+    { entries."_Worker--" = { }; expected = [ "_worker" ]; }
+    { entries."_worker-1" = { }; expected = [ "_worker-1" ]; }
+    { entries."_worker-_" = { }; expected = [ "_worker-_" ]; }
+    { entries."_" = { }; expected = [ "_" ]; }
+    { entries."__" = { }; expected = [ "__" ]; }
+    { entries."_--" = { }; expected = [ "_" ]; }
+    { entries.Writer = { }; expected = [ "writer" ]; }
+    { entries."0--" = { }; expected = [ "0--" ]; }
+    { entries = { a = { }; "a--" = { }; }; expected = [ "a" "a--" ]; }
+  ];
+  canonicalAgentIdChecks = lib.optionals usesAgentEntries (map (
+    { entries, expected }:
+    let
+      agents = explicitOwnership // { inherit entries; };
+      rendered = generatedConfig (moduleEval {
+        workspace.pinAgentDefaults = false;
+        config = { inherit agents; };
+      }) ".openclaw/openclaw.json";
+      actual = openclawLib.agentIds rendered;
+    in
+    if rendered.agents != agents then
+      throw "Canonical agent ID fixtures must preserve authored entries and ownership."
+    else if actual != expected then
+      throw "canonical-keyed-agent-ids ${builtins.toJSON (lib.attrNames entries)}: expected ${builtins.toJSON expected}, got ${builtins.toJSON actual}."
+    else
+      "ok"
+  ) canonicalAgentIdCases);
+
   invalidRosterChecks = lib.optionals usesAgentEntries (
     map (
       key:
@@ -275,10 +308,19 @@ let
       "writer\nname"
       (lib.concatStrings (lib.replicate 65 "a"))
     ]
+    ++ map (
+      keys:
+      requireEvalFailure "normalized agent collision ${builtins.toJSON keys}" (moduleEval {
+        config.agents = explicitOwnership // { entries = lib.genAttrs keys (_: { }); };
+      }).config.home.activation
+    ) [
+      [ "Writer" "writer" ]
+      [ "_worker-" "_worker" ]
+      [ "_worker--" "_worker" ]
+      [ "_Worker--" "_worker-" ]
+      [ "_" "_--" ]
+    ]
     ++ [
-      (requireEvalFailure "normalized agent collision" (moduleEval {
-        config.agents = explicitOwnership // { entries = { Writer = { }; writer = { }; }; };
-      }).config.home.activation)
       (requireEvalFailure "malformed roster value" (generatedConfig (moduleEval {
         config.agents.entries.writer.workspace = 7;
       }) ".openclaw/openclaw.json"))
@@ -1283,6 +1325,7 @@ let
       explicitWorkspaceCheck
       mergedRosterCheck
       authoredRosterChecks
+      canonicalAgentIdChecks
       invalidRosterChecks
       homeRelativeConfigCheck
       topLevelHomeRelativeConfigCheck

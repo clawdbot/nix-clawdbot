@@ -31,13 +31,15 @@ machine.wait_until_succeeds(
 roster_root = "/home/alice/.openclaw-roster"
 roster_config = json.loads(machine.succeed(f"cat {roster_root}/openclaw.json"))
 if "entries" in roster_config["agents"]:
-    assert roster_config["agents"]["entries"] == {"Writer": {}, "research": {}}
+    assert roster_config["agents"]["entries"] == {
+        "Writer": {}, "research": {}, "_worker--": {}, "a--": {}
+    }
     assert generated["agents"]["entries"] == {"main": {}}
-    expected_ids = ["research", "writer"]
+    expected_ids = ["_worker", "a--", "research", "writer"]
 else:
     assert roster_config["agents"]["list"] == [{"id": "writer"}, {"id": "research"}]
     expected_ids = ["main", "research", "writer"]
-assert machine.succeed(f"ls -1 {roster_root}/agents").splitlines() == expected_ids
+assert machine.succeed(f"LC_ALL=C ls -1 {roster_root}/agents").splitlines() == expected_ids
 for agent_id in expected_ids:
     profile = f"{roster_root}/agents/{agent_id}/agent/codex-home/home/.nix-profile/bin"
     machine.succeed(f"test -L {profile} && test -x {profile}/jq")
