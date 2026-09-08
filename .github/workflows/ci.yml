@@ -57,7 +57,7 @@ jobs:
 
       - name: Test JavaScript contracts
         run: |
-          nix shell nixpkgs#nodejs_22 --command node --test \
+          nix shell --option flake-registry '' --inputs-from . nixpkgs#nodejs_22 --command node --test \
             scripts/select-openclaw-release.test.mjs \
             maintainers/scripts/markdown-table.test.mjs \
             nix/scripts/openclaw-runtime-plugin-version.test.mjs \
