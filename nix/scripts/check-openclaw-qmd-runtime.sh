@@ -36,6 +36,23 @@ tmp_dir="$(mktemp -d)"
 trap 'rm -rf "$tmp_dir"' EXIT
 
 mkdir -p "$tmp_dir/home" "$tmp_dir/state" "$tmp_dir/config" "$tmp_dir/cache" "$tmp_dir/data" "$tmp_dir/logs"
+mkdir -p "$tmp_dir/notes"
+run_qmd() {
+  env HOME="$tmp_dir/home" XDG_CONFIG_HOME="$tmp_dir/config" \
+    XDG_CACHE_HOME="$tmp_dir/cache" XDG_DATA_HOME="$tmp_dir/data" \
+    NO_COLOR=1 "$qmd_bin" "$@"
+}
+printf '# Packaging probe\nInitial document.\n' > "$tmp_dir/notes/proof.md"
+run_qmd collection add "$tmp_dir/notes" --name nix-smoke >/dev/null
+printf '# Packaging probe\nNixqmdproof verifies updated document retrieval.\n' > "$tmp_dir/notes/proof.md"
+run_qmd update >/dev/null
+run_qmd search nixqmdproof -c nix-smoke --json > "$tmp_dir/search.json"
+if ! grep -Fq 'qmd://nix-smoke/proof.md' "$tmp_dir/search.json"; then
+  echo "QMD did not retrieve the updated synthetic document" >&2
+  cat "$tmp_dir/search.json" >&2
+  exit 1
+fi
+
 cat > "$tmp_dir/state/openclaw.json" <<'JSON'
 {
   "gateway": {
