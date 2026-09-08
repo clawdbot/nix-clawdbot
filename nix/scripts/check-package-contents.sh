@@ -39,25 +39,22 @@ if find "${root}/node_modules" -path "*/form-data/package.json" -type f -print |
   require_path "${root}/node_modules/combined-stream"
 fi
 
-public_surface_loader="$(
-  find "${root}/dist" -name "*.js" -type f -exec grep -sl "function loadBundledPluginPublicArtifactModuleSync" {} + | head -1
-)"
-if [ -z "$public_surface_loader" ]; then
-  echo "Missing bundled plugin public surface loader" >&2
-  exit 1
-fi
-if grep -q "rejectHardlinks: true" "$public_surface_loader"; then
-  echo "Bundled plugin public surface loader still rejects hardlinked package files" >&2
-  exit 1
-fi
-
-export PUBLIC_SURFACE_LOADER="$public_surface_loader"
 node --input-type=module <<'NODE'
+import fs from "node:fs";
+import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-const loaderPath = process.env.PUBLIC_SURFACE_LOADER;
-if (!loaderPath) {
-  throw new Error("PUBLIC_SURFACE_LOADER is not set");
+const dist = path.join(process.env.OPENCLAW_GATEWAY, "lib/openclaw/dist");
+const loaders = fs.readdirSync(dist, { withFileTypes: true })
+  .filter((entry) => entry.isFile() && /\.m?js$/.test(entry.name))
+  .map((entry) => path.join(dist, entry.name))
+  .filter((file) => fs.readFileSync(file, "utf8").includes("function loadBundledPluginPublicArtifactModuleSync"));
+if (loaders.length !== 1) {
+  throw new Error(`Expected exactly one root bundled plugin public surface loader, found ${loaders.length}`);
+}
+const [loaderPath] = loaders;
+if (fs.readFileSync(loaderPath, "utf8").includes("rejectHardlinks: true")) {
+  throw new Error("Bundled plugin public surface loader still rejects hardlinked package files");
 }
 
 const loader = await import(pathToFileURL(loaderPath).href);
