@@ -924,7 +924,8 @@ Use named instances when you need two local gateways. Keep the default package u
 
 Config activation supports paths containing spaces, including a custom
 `instances.<name>.configPath`. A leading `~/` is resolved against the configured
-Home Manager home directory before the config symlink is created.
+Home Manager home directory for activation, `home.file` destinations, the
+workspace pin, and launchd/systemd WorkingDirectory and environment paths.
 Systemd environment entries preserve spaces in the config and state paths.
 
 ```nix

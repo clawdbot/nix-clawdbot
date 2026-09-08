@@ -68,7 +68,8 @@ pkgs.testers.nixosTest {
               installApp = false;
               launchd.enable = false;
               instances.default = {
-                configPath = "/home/alice/.openclaw/config with spaces and 'quotes'.json";
+                stateDir = "~/openclaw state";
+                configPath = "~/openclaw state/config with spaces and 'quotes'.json";
                 workspaceDir = "~/custom workspace";
                 gatewayPort = 18999;
                 config = {

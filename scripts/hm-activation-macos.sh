@@ -41,13 +41,16 @@ fi
 test ! -e "$HOME/custom workspace"
 "$activation_package/activate"
 
-test -f "$HOME/.openclaw/config with spaces and 'quotes'.json"
-test -L "$HOME/.openclaw/config with spaces and 'quotes'.json"
+config_path="$HOME/openclaw state/config with spaces and 'quotes'.json"
+test -f "$config_path"
+test -L "$config_path"
+test ! -e "$HOME/~"
+grep -q '"workspace":"/tmp/hm-activation-home/custom workspace"' "$config_path"
 test -f "$HOME/custom workspace/LORE.md"
 test ! -L "$HOME/custom workspace/LORE.md"
 test -f "$plist"
-test -L "$HOME/.openclaw/agents/main/agent/codex-home/home/.nix-profile/bin"
-test -x "$HOME/.openclaw/agents/main/agent/codex-home/home/.nix-profile/bin/jq"
+test -L "$HOME/openclaw state/agents/main/agent/codex-home/home/.nix-profile/bin"
+test -x "$HOME/openclaw state/agents/main/agent/codex-home/home/.nix-profile/bin/jq"
 
 skill_root="$HOME/.local/share/nix-openclaw/skills/default"
 for skill in activation-skill copied-skill; do
@@ -58,6 +61,9 @@ test -z "$(find "$skill_root" -type f ! -links 1 -print)"
 test -z "$(find "$skill_root" -type f ! -user "$(id -un)" -print)"
 
 if command -v launchctl >/dev/null 2>&1; then
+  test "$(/usr/libexec/PlistBuddy -c 'Print :WorkingDirectory' "$plist")" = "$HOME/openclaw state"
+  test "$(/usr/libexec/PlistBuddy -c 'Print :EnvironmentVariables:OPENCLAW_STATE_DIR' "$plist")" = "$HOME/openclaw state"
+  test "$(/usr/libexec/PlistBuddy -c 'Print :EnvironmentVariables:OPENCLAW_CONFIG_PATH' "$plist")" = "$config_path"
   state_file="$home_dir/launchd-state.txt"
   running=false
   for _ in {1..20}; do
@@ -79,7 +85,7 @@ if command -v launchctl >/dev/null 2>&1; then
     openclaw_bin=${openclaw_bin%% gateway*}
   fi
   grep -q OPENCLAW_TEST_SECRET "$openclaw_bin"
-  OPENCLAW_CONFIG_PATH="$HOME/.openclaw/config with spaces and 'quotes'.json" \
+  OPENCLAW_CONFIG_PATH="$config_path" \
     "$openclaw_bin" skills list --json > "$home_dir/skills.json"
   grep -Eq '"name"[[:space:]]*:[[:space:]]*"activation-skill"' "$home_dir/skills.json"
   grep -Eq '"name"[[:space:]]*:[[:space:]]*"skill"' "$home_dir/skills.json"

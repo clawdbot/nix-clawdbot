@@ -8,9 +8,13 @@ machine.wait_until_succeeds(
     "systemctl show -p SubState home-manager-alice.service | grep -Eq '^SubState=(dead|exited)$'"
 )
 
-config_path = shlex.quote("/home/alice/.openclaw/config with spaces and 'quotes'.json")
+state_dir = "/home/alice/openclaw state"
+config_path = shlex.quote(f"{state_dir}/config with spaces and 'quotes'.json")
 machine.wait_until_succeeds(f"test -f {config_path}")
 machine.succeed(f"test -L {config_path}")
+machine.succeed("test ! -e /home/alice/'~'")
+generated = json.loads(machine.succeed(f"cat {config_path}"))
+assert generated["agents"]["defaults"]["workspace"] == "/home/alice/custom workspace"
 workspace = "'/home/alice/custom workspace'"
 machine.wait_until_succeeds(f"test -f {workspace}/AGENTS.md")
 machine.succeed(f"test ! -L {workspace}/AGENTS.md")
@@ -21,7 +25,7 @@ machine.succeed(f"test -f {workspace}/LORE.md")
 machine.succeed(f"grep -q '\"skipBootstrap\":true' {config_path}")
 machine.succeed(f"grep -q 'BEGIN NIX-REPORT' {workspace}/TOOLS.md")
 machine.wait_until_succeeds(
-    "test -x /home/alice/.openclaw/agents/main/agent/codex-home/home/.nix-profile/bin/jq"
+    f"test -x {shlex.quote(state_dir)}/agents/main/agent/codex-home/home/.nix-profile/bin/jq"
 )
 
 skill_root = "/home/alice/.local/share/nix-openclaw/skills/default"
@@ -48,6 +52,13 @@ user_env = "XDG_RUNTIME_DIR=/run/user/1000 DBUS_SESSION_BUS_ADDRESS=unix:path=/r
 machine.succeed(f"su - alice -c '{user_env} systemctl --user daemon-reload'")
 machine.succeed(f"su - alice -c '{user_env} systemctl --user start openclaw-gateway.service'")
 machine.wait_for_unit("openclaw-gateway.service", user="alice")
+pid = machine.succeed(
+    f"su - alice -c '{user_env} systemctl --user show openclaw-gateway.service -p MainPID --value'"
+).strip()
+assert machine.succeed(f"readlink /proc/{pid}/cwd").strip() == state_dir
+environment = machine.succeed(f"cat /proc/{pid}/environ").split("\0")
+assert f"OPENCLAW_STATE_DIR={state_dir}" in environment
+assert f"OPENCLAW_CONFIG_PATH={state_dir}/config with spaces and 'quotes'.json" in environment
 
 try:
     machine.wait_for_open_port(18999)
