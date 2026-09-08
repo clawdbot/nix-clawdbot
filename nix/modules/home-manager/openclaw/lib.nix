@@ -28,8 +28,8 @@ let
 
   bundledPluginSources =
     let
-      openclawToolsRev = "4c1cee3c7eaf68f9de0f756be1484534f5bb5f34";
-      openclawToolsNarHash = "sha256-tXWkN1VnwFG8XlRqW/e7VwbKnUfyU9tB7YDm9QHJXTY=";
+      openclawToolsRev = "25fcec492e22996af9ee87106338a448bc6893a2";
+      openclawToolsNarHash = "sha256-FF75z2jVZJjymkLtt7e7rKBLQZtC1LBEoM8qDhQPLQ8=";
       openclawTools =
         tool:
         "github:openclaw/nix-openclaw-tools?dir=tools/${tool}&rev=${openclawToolsRev}&narHash=${openclawToolsNarHash}";

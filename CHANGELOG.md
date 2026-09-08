@@ -23,6 +23,7 @@ Older repository history is available in git.
 - Package upstream OpenClaw `2026.7.1-2`, retain runtime plugin version `2026.7.1` for correction releases, and repair the macOS `2026.7.1` app artifact hash; thanks @vincentkoc.
 - Preserve canonical scoped npm package encoding and fully escape generated CI table cells; thanks @vincentkoc (#114).
 - Document declarative Gmail hook session keys and their allowed prefix to prevent rejected callbacks (#113).
+- Refresh Nixpkgs, Home Manager, the packaged OpenClaw tools, and the Linux QMD memory backend to 2.8.3, keeping bundled tool plugin sources aligned with the flake lock.
 - Refresh CI checkout to 7.0.1 and the Nix installer to 31.11.1, which fixes a Nix build crash.
 
 ## 2026-09-04

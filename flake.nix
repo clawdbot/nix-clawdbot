@@ -14,7 +14,7 @@
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     nix-openclaw-tools.url = "github:openclaw/nix-openclaw-tools";
-    qmd.url = "github:tobi/qmd/v2.1.0";
+    qmd.url = "github:tobi/qmd/v2.8.3";
     qmd.inputs.flake-utils.follows = "flake-utils";
     qmd.inputs.nixpkgs.follows = "nixpkgs";
   };

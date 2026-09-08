@@ -25,11 +25,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783963347,
-        "narHash": "sha256-r376E2XpakiXwModDHIxlvB6qLq4iFVEq730vxOO4JY=",
+        "lastModified": 1788651960,
+        "narHash": "sha256-v9wJd32eZ2bvhBzVOd7TIjLQd011P7nwOhjKtWlci5I=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "a45a7c451455a51ae740ec3bce4024b312809c29",
+        "rev": "2c0350c759688177331b8f5242311fae8877bdb3",
         "type": "github"
       },
       "original": {
@@ -43,11 +43,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1778060041,
-        "narHash": "sha256-tXWkN1VnwFG8XlRqW/e7VwbKnUfyU9tB7YDm9QHJXTY=",
+        "lastModified": 1788766984,
+        "narHash": "sha256-FF75z2jVZJjymkLtt7e7rKBLQZtC1LBEoM8qDhQPLQ8=",
         "owner": "openclaw",
         "repo": "nix-openclaw-tools",
-        "rev": "4c1cee3c7eaf68f9de0f756be1484534f5bb5f34",
+        "rev": "25fcec492e22996af9ee87106338a448bc6893a2",
         "type": "github"
       },
       "original": {
@@ -74,11 +74,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1783776592,
-        "narHash": "sha256-UgCQzxeWI75XM8G+hPrPh+MKzEPjG3SpAj7dtqSbksA=",
+        "lastModified": 1788752844,
+        "narHash": "sha256-VaWGJ6+cIYN2erfSecbRV+4ljI185Ty2wUrXyvQbgOw=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "e7a3ca8092b61ff85b6a45bf863ea2b2d6a661b3",
+        "rev": "dc5d91f840324650bac8c379428c7037a416959a",
         "type": "github"
       },
       "original": {
@@ -98,16 +98,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1775429264,
-        "narHash": "sha256-bqIVaNRTa8H5vrw3RwsD7QdtTa0xNvRuEVzlzE1hIBQ=",
+        "lastModified": 1786919312,
+        "narHash": "sha256-/7Z94r/9rXqzKlz/YkB6/nToSCPamV4Dnxm8EhelTDo=",
         "owner": "tobi",
         "repo": "qmd",
-        "rev": "65cd1b3fd02891d1ee0eefa751620918664fa321",
+        "rev": "facd35e01359e59d938bc9418e93fb9318addee3",
         "type": "github"
       },
       "original": {
         "owner": "tobi",
-        "ref": "v2.1.0",
+        "ref": "v2.8.3",
         "repo": "qmd",
         "type": "github"
       }
