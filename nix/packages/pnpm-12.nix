@@ -4,7 +4,7 @@
   stdenvNoCC,
   autoPatchelfHook,
   fetchurl,
-  nodejs_22,
+  nodejs_24,
 }:
 
 let
@@ -68,8 +68,8 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
   passthru = {
     majorVersion = lib.versions.major finalAttrs.version;
-    nodejs = nodejs_22;
-    "nodejs-slim" = nodejs_22;
+    nodejs = nodejs_24;
+    "nodejs-slim" = nodejs_24;
   };
 
   meta = {

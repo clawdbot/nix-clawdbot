@@ -680,7 +680,7 @@ function probeLockMaterialization(row, artifact, npmDepsHash, dependencyMode = "
     let
       flake = builtins.getFlake (toString ${repoRoot});
       pkgs = import flake.inputs.nixpkgs { system = builtins.currentSystem; };
-      npmHooksForNode = pkgs.npmHooks.override { nodejs = pkgs.nodejs_22; };
+      npmHooksForNode = pkgs.npmHooks.override { nodejs = pkgs.nodejs_24; };
       prepareNpmScript = ${prepareNpmScriptPath};
       pluginSrc = pkgs.fetchurl {
         url = ${nixString(artifact.tarballUrl)};
@@ -693,8 +693,8 @@ function probeLockMaterialization(row, artifact, npmDepsHash, dependencyMode = "
         src = pluginSrc;
         sourceRoot = "package";
         nativeBuildInputs = [
-          pkgs.nodejs_22
-          pkgs.nodejs_22.python
+          pkgs.nodejs_24
+          pkgs.nodejs_24.python
           npmHooksForNode.npmConfigHook
         ] ++ pkgs.lib.optionals pkgs.stdenvNoCC.hostPlatform.isDarwin [
           pkgs.cctools
@@ -704,13 +704,13 @@ function probeLockMaterialization(row, artifact, npmDepsHash, dependencyMode = "
           src = pluginSrc;
           sourceRoot = "package";
           hash = ${nixString(npmDepsHash)};
-          nativeBuildInputs = [ pkgs.nodejs_22 ];
+          nativeBuildInputs = [ pkgs.nodejs_24 ];
           OPENCLAW_RUNTIME_PLUGIN_DEPENDENCY_MODE = ${nixString(dependencyMode)};
           ${packageLockEnv}
           OPENCLAW_RUNTIME_PLUGIN_PACKAGE_NAME = ${nixString(artifact.packageName)};
           OPENCLAW_RUNTIME_PLUGIN_VERSION = ${nixString(artifact.version)};
           postPatch = ''
-            ${"\${pkgs.nodejs_22}"}/bin/node ${"\${prepareNpmScript}"}
+            ${"\${pkgs.nodejs_24}"}/bin/node ${"\${prepareNpmScript}"}
           '';
         };
         npmInstallFlags = [
@@ -729,7 +729,7 @@ function probeLockMaterialization(row, artifact, npmDepsHash, dependencyMode = "
           ${packageLockEnv}
         };
         postPatch = ''
-          ${"\${pkgs.nodejs_22}"}/bin/node ${"\${prepareNpmScript}"}
+          ${"\${pkgs.nodejs_24}"}/bin/node ${"\${prepareNpmScript}"}
         '';
         installPhase = ''
           mkdir -p "$out"

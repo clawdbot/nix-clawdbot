@@ -3,7 +3,7 @@
   stdenv,
   fetchFromGitHub,
   fetchurl,
-  nodejs_22,
+  nodejs_24,
   pnpm_10,
   pnpm_11,
   pnpm_12,
@@ -96,7 +96,7 @@ let
       expectedPackages="$(mktemp)"
       yq -r '.packages | to_entries[] | select(.value.resolution.integrity) | [.key, .value.resolution.integrity] | @tsv' pnpm-lock.yaml > "$expectedPackages"
       cut -f2 "$expectedPackages" | sort -u > "$expectedIntegrities"
-      ${nodejs_22}/bin/node --no-warnings ${../scripts/list-pnpm-store-integrities.js} "$storePath" | sort -u > "$actualIntegrities"
+      ${nodejs_24}/bin/node --no-warnings ${../scripts/list-pnpm-store-integrities.js} "$storePath" | sort -u > "$actualIntegrities"
       comm -23 "$expectedIntegrities" "$actualIntegrities" > "$missingIntegrities"
       if [ -s "$missingIntegrities" ]; then
         echo "ERROR: pnpm store is missing package tarballs from pnpm-lock.yaml:" >&2
@@ -104,7 +104,7 @@ let
         exit 1
       fi
 
-      ${nodejs_22}/bin/node --no-warnings ${../scripts/normalize-pnpm-store-index.js} "$storePath"
+      ${nodejs_24}/bin/node --no-warnings ${../scripts/normalize-pnpm-store-index.js} "$storePath"
     '';
     postInstall = lib.optionalString pnpmNeedsVerifiedStore ''
       verifiedCache="$(find "$HOME" -path '*/lockfile-verified.jsonl' -type f -print -quit)"
@@ -122,7 +122,7 @@ let
     npm_config_platform = pnpmPlatform;
     nativeBuildInputs = [
       git
-      nodejs_22
+      nodejs_24
     ];
   };
 
@@ -130,7 +130,7 @@ let
     npm_config_arch = pnpmArch;
     npm_config_platform = pnpmPlatform;
     PNPM_CONFIG_MANAGE_PACKAGE_MANAGER_VERSIONS = "false";
-    npm_config_nodedir = nodejs_22;
+    npm_config_nodedir = nodejs_24;
     npm_config_python = python3;
     NODE_PATH = "${nodeAddonApi}/lib/node_modules:${node-gyp}/lib/node_modules";
     PNPM_DEPS = pnpmDeps;
@@ -175,7 +175,7 @@ in
     ;
 
   nativeBuildInputs = [
-    nodejs_22
+    nodejs_24
     selectedPnpm
     pkg-config
     jq

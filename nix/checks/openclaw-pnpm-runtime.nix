@@ -1,6 +1,6 @@
 {
   stdenvNoCC,
-  nodejs_22,
+  nodejs_24,
   pnpm_11,
   pnpm_12,
 }:
@@ -13,7 +13,7 @@ stdenvNoCC.mkDerivation {
   dontConfigure = true;
   dontBuild = true;
 
-  nativeBuildInputs = [ nodejs_22 ];
+  nativeBuildInputs = [ nodejs_24 ];
 
   env = {
     PNPM_11_PACKAGE = pnpm_11;

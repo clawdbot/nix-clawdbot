@@ -2,7 +2,7 @@
   lib,
   stdenvNoCC,
   fetchurl,
-  nodejs_22,
+  nodejs_24,
 }:
 
 stdenvNoCC.mkDerivation (finalAttrs: {
@@ -18,8 +18,8 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     rm -rf dist/reflink.*node dist/vendor
   '';
 
-  buildInputs = [ nodejs_22 ];
-  nativeBuildInputs = [ nodejs_22 ];
+  buildInputs = [ nodejs_24 ];
+  nativeBuildInputs = [ nodejs_24 ];
 
   installPhase = ''
     runHook preInstall
@@ -28,10 +28,10 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     cp -R . $out/libexec/pnpm
     chmod +x $out/libexec/pnpm/bin/pnpm.cjs $out/libexec/pnpm/bin/pnpx.cjs
     substitute ${../scripts/pnpm-11-wrapper.sh} $out/bin/pnpm \
-      --subst-var-by node ${nodejs_22}/bin/node \
+      --subst-var-by node ${nodejs_24}/bin/node \
       --subst-var-by entrypoint $out/libexec/pnpm/bin/pnpm.cjs
     substitute ${../scripts/pnpm-11-wrapper.sh} $out/bin/pnpx \
-      --subst-var-by node ${nodejs_22}/bin/node \
+      --subst-var-by node ${nodejs_24}/bin/node \
       --subst-var-by entrypoint $out/libexec/pnpm/bin/pnpx.cjs
     chmod +x $out/bin/pnpm $out/bin/pnpx
 
@@ -57,8 +57,8 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
   passthru = {
     majorVersion = lib.versions.major finalAttrs.version;
-    nodejs = nodejs_22;
-    "nodejs-slim" = nodejs_22;
+    nodejs = nodejs_24;
+    "nodejs-slim" = nodejs_24;
   };
 
   meta = {

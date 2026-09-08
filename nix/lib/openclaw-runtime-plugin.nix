@@ -4,7 +4,7 @@
   fetchurl,
   fetchNpmDeps,
   npmHooks,
-  nodejs_22,
+  nodejs_24,
   cctools,
   cacert,
   openclawPackage ? null,
@@ -23,7 +23,7 @@ let
   bundledPackageRootsFile =
     builtins.toFile "openclaw-runtime-plugin-${lock.id}-bundled-package-roots"
       ((lib.concatStringsSep "\n" (lock.bundledPackageRoots or [ ])) + "\n");
-  npmHooksForNode = npmHooks.override { nodejs = nodejs_22; };
+  npmHooksForNode = npmHooks.override { nodejs = nodejs_24; };
   sourceHash = lock.nixHash or lock.hash;
   pluginSrc =
     if (lock.tarballUrl or null) != null then
@@ -47,7 +47,7 @@ let
         dontConfigure = true;
         dontBuild = true;
         nativeBuildInputs = [
-          nodejs_22
+          nodejs_24
           cacert
         ];
         SSL_CERT_FILE = "${cacert}/etc/ssl/certs/ca-bundle.crt";
@@ -55,7 +55,7 @@ let
         outputHashAlgo = "sha256";
         outputHash = sourceHash;
         installPhase = ''
-          ${nodejs_22}/bin/node ${../scripts/openclaw-runtime-plugin-fetch-source.mjs} \
+          ${nodejs_24}/bin/node ${../scripts/openclaw-runtime-plugin-fetch-source.mjs} \
             ${lib.escapeShellArg lock.sourceSpec} "$out"
         '';
       }
@@ -84,10 +84,10 @@ let
       sourceRoot = "package";
 
       nativeBuildInputs = [
-        nodejs_22
+        nodejs_24
       ]
       ++ lib.optionals isLocked [
-        nodejs_22.python
+        nodejs_24.python
         npmHooksForNode.npmConfigHook
       ]
       ++ lib.optionals (isLocked && stdenvNoCC.hostPlatform.isDarwin) [ cctools ];
@@ -104,7 +104,7 @@ let
       dontBuild = true;
 
       postPatch = lib.optionalString isLocked ''
-        ${nodejs_22}/bin/node ${../scripts/openclaw-runtime-plugin-prepare-npm.mjs}
+        ${nodejs_24}/bin/node ${../scripts/openclaw-runtime-plugin-prepare-npm.mjs}
       '';
 
       env = {
@@ -132,7 +132,7 @@ let
         OPENCLAW_RUNTIME_PLUGIN_PEER_OPENCLAW = lock.peerOpenClaw;
       };
 
-      installPhase = "${nodejs_22}/bin/node ${../scripts/openclaw-runtime-plugin-install.mjs}";
+      installPhase = "${nodejs_24}/bin/node ${../scripts/openclaw-runtime-plugin-install.mjs}";
 
       passthru.openclawRuntimePlugin = {
         inherit (lock) id;
@@ -162,12 +162,12 @@ let
         src = pluginSrc;
         sourceRoot = "package";
         hash = lock.npmDepsHash;
-        nativeBuildInputs = [ nodejs_22 ];
+        nativeBuildInputs = [ nodejs_24 ];
         OPENCLAW_RUNTIME_PLUGIN_DEPENDENCY_MODE = dependencyMode;
         OPENCLAW_RUNTIME_PLUGIN_PACKAGE_NAME = lock.packageName or "";
         OPENCLAW_RUNTIME_PLUGIN_VERSION = lock.version or "";
         postPatch = ''
-          ${nodejs_22}/bin/node ${../scripts/openclaw-runtime-plugin-prepare-npm.mjs}
+          ${nodejs_24}/bin/node ${../scripts/openclaw-runtime-plugin-prepare-npm.mjs}
         '';
       } // packageLockEnv);
     }

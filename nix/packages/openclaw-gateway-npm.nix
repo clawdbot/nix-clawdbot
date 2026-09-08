@@ -2,7 +2,7 @@
   lib,
   stdenv,
   buildNpmPackage,
-  nodejs_22,
+  nodejs_24,
   makeWrapper,
   sourceInfo,
   bundledAcpx,
@@ -10,7 +10,7 @@
 
 let
   buildNpmPackageForOpenClaw = buildNpmPackage.override {
-    nodejs = nodejs_22;
+    nodejs = nodejs_24;
   };
   wrapperSrc = ../npm/openclaw;
   lock = builtins.fromJSON (builtins.readFile "${wrapperSrc}/package-lock.json");
@@ -42,7 +42,7 @@ buildNpmPackageForOpenClaw {
   nativeBuildInputs = [ makeWrapper ];
 
   env = {
-    NODE_BIN = "${nodejs_22}/bin/node";
+    NODE_BIN = "${nodejs_24}/bin/node";
     # stdenv unpacks the directory source under its hash-stripped store name;
     # postUnpack runs in the build root before stdenv enters it.
     OPENCLAW_NPM_WRAPPER_DIR = baseNameOf wrapperSrc;
