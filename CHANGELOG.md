@@ -12,6 +12,8 @@ Older repository history is available in git.
 
 **Highlights:** Nix-managed skills remain discoverable with OpenClaw’s hardlink checks, and documented home-relative paths work consistently across Home Manager activation and gateway services. Changes below cover the package state since `v2026.7.1`.
 
+- Admit @vincentkoc to the existing maintainer-only CI actor lists for provenance, Linux, and macOS validation (2026-09-09).
+- Run Linux JavaScript contract tests with Node.js 22 from the repository's locked Nixpkgs input and disable the global flake registry for that command, avoiding registry fetch failures (2026-09-09).
 - Materialize configured user and plugin skills as per-instance runtime copies, preserving all-agent discovery, extra load paths, and cleanup boundaries; thanks @vsumner (#118).
 - Resolve leading `~/` in instance state, workspace, and config paths consistently for managed files, runtime profiles, and launchd/systemd services, including paths containing spaces and quotes; thanks @SebTardif (#130).
 - Support packaging OpenClaw 2026.8.1+ lockless runtime plugins once upstream ships npm package-lock release evidence, with dependencies bound to the pinned release SHA (2026-09-06).
