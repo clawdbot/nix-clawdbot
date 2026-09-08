@@ -25,7 +25,12 @@ pkgs.testers.nixosTest {
         useGlobalPkgs = true;
         useUserPackages = true;
         users.alice =
-          { lib, ... }:
+          { config, lib, ... }:
+          let
+            openclawLib = import ../modules/home-manager/openclaw/lib.nix {
+              inherit config lib pkgs;
+            };
+          in
           {
             imports = [ openclawModule ];
 
@@ -86,7 +91,19 @@ pkgs.testers.nixosTest {
                   plugins = {
                     enabled = false;
                   };
+                } // lib.optionalAttrs openclawLib.usesAgentEntries {
+                  agents.entries = { };
                 };
+              };
+              instances.roster = {
+                launchd.enable = false;
+                systemd.enable = false;
+                config.agents =
+                  if openclawLib.usesAgentEntries then
+                    lib.optionalAttrs openclawLib.hasAgentOwnership { ownership = "explicit"; }
+                    // { entries = { Writer = { }; research = { }; }; }
+                  else
+                    { list = [ { id = "writer"; } { id = "research"; } ]; };
               };
             };
 

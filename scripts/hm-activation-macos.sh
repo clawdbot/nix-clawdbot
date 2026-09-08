@@ -52,6 +52,29 @@ test -f "$plist"
 test -L "$HOME/openclaw state/agents/main/agent/codex-home/home/.nix-profile/bin"
 test -x "$HOME/openclaw state/agents/main/agent/codex-home/home/.nix-profile/bin/jq"
 
+jq_bin="$HOME/openclaw state/agents/main/agent/codex-home/home/.nix-profile/bin/jq"
+implicit_root="$HOME/.openclaw-implicit"
+roster_root="$HOME/.openclaw-roster"
+if "$jq_bin" -e '.agents | has("entries")' "$roster_root/openclaw.json" >/dev/null; then
+  "$jq_bin" -e '.agents.entries == {"Writer": {}, "research": {}}' "$roster_root/openclaw.json"
+  "$jq_bin" -e '.agents.entries == {"main": {}}' "$config_path"
+  "$jq_bin" -e '.agents == {"entries": {"main": {}}}' "$implicit_root/openclaw.json"
+  expected_ids=(research writer)
+else
+  "$jq_bin" -e '.agents.list == [{"id": "writer"}, {"id": "research"}]' "$roster_root/openclaw.json"
+  "$jq_bin" -e 'has("agents") | not' "$implicit_root/openclaw.json"
+  expected_ids=(main research writer)
+fi
+test "$(ls -1 "$implicit_root/agents")" = main
+test -L "$implicit_root/agents/main/agent/codex-home/home/.nix-profile/bin"
+test -x "$implicit_root/agents/main/agent/codex-home/home/.nix-profile/bin/jq"
+test "$(LC_ALL=C ls -1 "$roster_root/agents")" = "$(printf '%s\n' "${expected_ids[@]}")"
+for agent_id in "${expected_ids[@]}"; do
+  profile="$roster_root/agents/$agent_id/agent/codex-home/home/.nix-profile/bin"
+  test -L "$profile"
+  test -x "$profile/jq"
+done
+
 skill_root="$HOME/.local/share/nix-openclaw/skills/default"
 for skill in activation-skill copied-skill; do
   test -f "$skill_root/$skill/SKILL.md"

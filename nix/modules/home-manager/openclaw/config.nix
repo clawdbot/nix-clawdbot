@@ -212,7 +212,7 @@ let
       ];
       mergedConfig0 = lib.recursiveUpdate mergedConfigWithoutLoadPaths generatedLoadConfig;
       existingWorkspace = (((mergedConfig0.agents or { }).defaults or { }).workspace or null);
-      mergedConfig =
+      workspaceConfig =
         if (cfg.workspace.pinAgentDefaults or true) && existingWorkspace == null then
           lib.recursiveUpdate mergedConfig0 {
             agents = {
@@ -223,6 +223,17 @@ let
           }
         else
           mergedConfig0;
+      workspaceAgents = workspaceConfig.agents or { };
+      # Canonicalize upstream's implicit main before the keys-only profile reader.
+      mergedConfig =
+        if
+          openclawLib.usesAgentEntries
+          && (workspaceAgents.entries or { }) == { }
+          && (workspaceAgents.ownership or null) != "explicit"
+        then
+          lib.recursiveUpdate workspaceConfig { agents.entries.main = { }; }
+        else
+          workspaceConfig;
       hasExecSecretFlow = containsExecSecretFlow mergedConfig;
       execSecretFlowWarning = "programs.openclaw.instances.${name}.config uses OpenClaw exec secrets. nix-openclaw passes this through, but does not support or verify runtime command-based secret resolution. Prefer host-managed secrets with env/file SecretRefs: ${execSecretFlowDocsUrl}";
       qmdEnabled = (((mergedConfig.memory or { }).backend or null) == "qmd");
@@ -247,12 +258,7 @@ let
       configJson =
         if hasExecSecretFlow then lib.warn execSecretFlowWarning rawConfigJson else rawConfigJson;
       configFile = pkgs.writeText "openclaw-${name}.json" configJson;
-      agentIds =
-        let
-          agents = ((mergedConfig.agents or { }).list or [ ]);
-          configured = lib.filter (id: id != null) (map (agent: agent.id or null) agents);
-        in
-        lib.unique ([ "main" ] ++ configured);
+      agentIds = openclawLib.agentIds mergedConfig;
       codexRuntimeProfiles = map (
         agentId: "${stateDir}/agents/${agentId}/agent/codex-home/home/.nix-profile"
       ) agentIds;

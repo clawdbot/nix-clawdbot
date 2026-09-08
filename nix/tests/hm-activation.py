@@ -28,6 +28,20 @@ machine.wait_until_succeeds(
     f"test -x {shlex.quote(state_dir)}/agents/main/agent/codex-home/home/.nix-profile/bin/jq"
 )
 
+roster_root = "/home/alice/.openclaw-roster"
+roster_config = json.loads(machine.succeed(f"cat {roster_root}/openclaw.json"))
+if "entries" in roster_config["agents"]:
+    assert roster_config["agents"]["entries"] == {"Writer": {}, "research": {}}
+    assert generated["agents"]["entries"] == {"main": {}}
+    expected_ids = ["research", "writer"]
+else:
+    assert roster_config["agents"]["list"] == [{"id": "writer"}, {"id": "research"}]
+    expected_ids = ["main", "research", "writer"]
+assert machine.succeed(f"ls -1 {roster_root}/agents").splitlines() == expected_ids
+for agent_id in expected_ids:
+    profile = f"{roster_root}/agents/{agent_id}/agent/codex-home/home/.nix-profile/bin"
+    machine.succeed(f"test -L {profile} && test -x {profile}/jq")
+
 skill_root = "/home/alice/.local/share/nix-openclaw/skills/default"
 for skill in ["activation-skill", "copied-skill"]:
     machine.succeed(f"test -f {skill_root}/{skill}/SKILL.md")

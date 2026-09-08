@@ -928,6 +928,14 @@ Home Manager home directory for activation, `home.file` destinations, the
 workspace pin, and launchd/systemd WorkingDirectory and environment paths.
 Systemd environment entries preserve spaces in the config and state paths.
 
+Home Manager follows the pinned schema's agent roster shape. On schemas with
+`agents.entries`, missing or empty entries without explicit ownership emit
+`agents.entries.main = {}`.
+This also applies with `workspace.pinAgentDefaults = false`, without setting
+`agents.defaults.workspace`. Nonempty rosters and explicit ownership remain
+unchanged; explicit ownership with missing or empty entries remains invalid.
+Keyed IDs are validated and lowercased for runtime profile paths.
+
 ```nix
 programs.openclaw = {
   workspace = {

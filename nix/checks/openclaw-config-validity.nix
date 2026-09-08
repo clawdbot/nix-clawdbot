@@ -113,7 +113,14 @@ let
   };
 
   configPathKey = ".openclaw/openclaw.json";
-  configFile = moduleEval.config.home.file."${configPathKey}".source;
+  openclawLib = import ../modules/home-manager/openclaw/lib.nix {
+    inherit lib pkgs;
+    config = moduleEval.config;
+  };
+  renderedConfig = builtins.fromJSON moduleEval.config.home.file."${configPathKey}".text;
+  configFile =
+    assert !openclawLib.usesAgentEntries || renderedConfig.agents.entries == { main = { }; };
+    moduleEval.config.home.file."${configPathKey}".source;
   expectedWorkspace = "/tmp/openclaw-explicit-workspace";
 
 in
