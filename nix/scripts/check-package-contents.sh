@@ -29,10 +29,9 @@ require_path "${root}/dist-runtime/extensions/acpx/runtime-api.js"
 require_path "${root}/dist-runtime/extensions/acpx/setup-api.js"
 require_path "${root}/dist-runtime/extensions/acpx/skills/acp-router/SKILL.md"
 require_path "${root}/docs/reference/templates"
-require_path "${root}/docs/reference/templates/AGENTS.md"
-require_path "${root}/docs/reference/templates/SOUL.md"
-require_path "${root}/docs/reference/templates/TOOLS.md"
-require_path "${root}/src/agents/templates/HEARTBEAT.md"
+for template in AGENTS SOUL IDENTITY USER BOOTSTRAP TOOLS; do
+  require_path "${root}/docs/reference/templates/${template}.md"
+done
 require_path "${root}/skills"
 if find "${root}/node_modules" -path "*/form-data/package.json" -type f -print | grep -q .; then
   require_path "${root}/node_modules/hasown"
@@ -44,7 +43,12 @@ import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-const dist = path.join(process.env.OPENCLAW_GATEWAY, "lib/openclaw/dist");
+const root = path.join(process.env.OPENCLAW_GATEWAY, "lib/openclaw");
+const packageJson = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
+if (packageJson.files.includes("src/agents/templates/")) {
+  fs.accessSync(path.join(root, "src/agents/templates/HEARTBEAT.md"));
+}
+const dist = path.join(root, "dist");
 const loaders = fs.readdirSync(dist, { withFileTypes: true })
   .filter((entry) => entry.isFile() && /\.m?js$/.test(entry.name))
   .map((entry) => path.join(dist, entry.name))

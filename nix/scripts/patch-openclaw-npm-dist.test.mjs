@@ -333,7 +333,8 @@ for (const ext of ["js", "mjs"]) {
     });
   }
 }
-function packageFixture(t, ext) {
+const templateDocs = ["AGENTS", "SOUL", "IDENTITY", "USER", "BOOTSTRAP", "TOOLS"];
+function packageFixture(t, ext, files = ["src/agents/templates/"]) {
   const f = fixture(t, ext),
     gateway = path.join(f.root, "gateway"),
     root = path.join(gateway, "lib/openclaw");
@@ -348,14 +349,14 @@ function packageFixture(t, ext) {
     "dist/extensions/memory-core/openclaw.plugin.json",
     "dist-runtime/extensions/memory-core/openclaw.plugin.json",
     ...acpx.map((name) => `dist-runtime/extensions/acpx/${name}`),
-    ...["AGENTS.md", "SOUL.md", "TOOLS.md"].map((name) => `docs/reference/templates/${name}`),
+    ...templateDocs.map((name) => `docs/reference/templates/${name}.md`),
     "src/agents/templates/HEARTBEAT.md",
     "skills/example/SKILL.md",
     "node_modules/placeholder",
     "dist/target.js",
   ];
   for (const name of required) put(name);
-  put("package.json", '{"type":"module"}');
+  put("package.json", JSON.stringify({ type: "module", files }));
   put("dist/runtime-model-auth.runtime.js", 'export * from "./target.js";\n');
   put(
     "dist/provider-policy-api.cjs",
@@ -397,3 +398,22 @@ for (const ext of ["js", "mjs"])
         assert.equal(fs.readFileSync(path.join(f.root, "dist/loaded"), "utf8"), "public artifact loaded");
     });
   }
+for (const ext of ["js", "mjs"])
+  for (const legacy of [false, true])
+    for (const missing of [
+      null,
+      "src/agents/templates/HEARTBEAT.md",
+      ...templateDocs.map((name) => `docs/reference/templates/${name}.md`),
+    ]) {
+      test(`package templates ${ext} ${legacy ? "legacy" : "retired"}: ${missing ?? "complete"}`, (t) => {
+        const f = packageFixture(t, ext, legacy ? ["src/agents/templates/"] : ["dist/", "docs/", "skills/"]);
+        if (missing) fs.unlinkSync(path.join(f.root, missing));
+        if (legacy && missing === "src/agents/templates/HEARTBEAT.md")
+          f.put("docs/reference/templates/HEARTBEAT.md", "Documentation cannot replace the runtime template.");
+        const result = f.run(),
+          passes = missing === null || (!legacy && missing === "src/agents/templates/HEARTBEAT.md");
+        assert.equal(result.status, passes ? 0 : 1, result.stdout + result.stderr);
+        if (passes) assert.equal(fs.readFileSync(path.join(f.root, "dist/loaded"), "utf8"), "public artifact loaded");
+        else assert.ok(result.stderr.includes(missing), result.stderr);
+      });
+    }
