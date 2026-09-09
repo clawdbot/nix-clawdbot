@@ -8,7 +8,13 @@
 let
   cfg = config.services.openclaw-gateway;
   qmdPackage = pkgs.openclawPackages.qmd or null;
-  qmdEnabled = (((cfg.config.memory or { }).backend or null) == "qmd");
+  inherit (import ../../lib/openclaw-config-capabilities.nix { inherit lib; }) supportsQmdBackend;
+  qmdRequested = (((cfg.config.memory or { }).backend or null) == "qmd");
+  qmdEnabled = supportsQmdBackend && qmdRequested;
+  retiredQmdConfig =
+    qmdRequested
+    || lib.hasAttrByPath [ "memory" "qmd" ] cfg.config
+    || lib.hasAttrByPath [ "memory" "search" "qmd" ] cfg.config;
   toJSONWithContext = import ../../lib/json-with-context.nix { inherit lib; };
 
   deepConfigType = lib.types.mkOptionType {
@@ -160,6 +166,10 @@ in
       {
         assertion = !qmdEnabled || qmdPackage != null;
         message = "services.openclaw-gateway.config.memory.backend = \"qmd\" requires a qmd package in openclawPackages.";
+      }
+      {
+        assertion = supportsQmdBackend || !retiredQmdConfig;
+        message = "This OpenClaw schema retired the QMD backend. Remove memory.backend = \"qmd\", memory.qmd, and memory.search.qmd from services.openclaw-gateway.config; standalone QMD remains available through explicit servicePath.";
       }
     ];
 

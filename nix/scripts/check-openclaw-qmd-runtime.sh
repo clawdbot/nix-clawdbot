@@ -53,17 +53,6 @@ if ! grep -Fq 'qmd://nix-smoke/proof.md' "$tmp_dir/search.json"; then
   exit 1
 fi
 
-cat > "$tmp_dir/state/openclaw.json" <<'JSON'
-{
-  "gateway": {
-    "mode": "local"
-  },
-  "memory": {
-    "backend": "qmd"
-  }
-}
-JSON
-
 env \
   HOME="$tmp_dir/home" \
   XDG_CONFIG_HOME="$tmp_dir/config" \
@@ -75,26 +64,6 @@ env \
   OPENCLAW_NIX_MODE=1 \
   PATH="${QMD_PACKAGE}/bin:$PATH" \
   NO_COLOR=1 \
-  "$openclaw_bin" config validate --json >/dev/null
-
-backend="$(
-  env \
-    HOME="$tmp_dir/home" \
-    XDG_CONFIG_HOME="$tmp_dir/config" \
-    XDG_CACHE_HOME="$tmp_dir/cache" \
-    XDG_DATA_HOME="$tmp_dir/data" \
-    OPENCLAW_CONFIG_PATH="$tmp_dir/state/openclaw.json" \
-    OPENCLAW_STATE_DIR="$tmp_dir/state" \
-    OPENCLAW_LOG_DIR="$tmp_dir/logs" \
-    OPENCLAW_NIX_MODE=1 \
-    PATH="${QMD_PACKAGE}/bin:$PATH" \
-    NO_COLOR=1 \
-    "$openclaw_bin" config get memory.backend --json
-)"
-
-if [ "$backend" != '"qmd"' ]; then
-  echo "OpenClaw did not read opt-in QMD memory config: $backend" >&2
-  exit 1
-fi
+  node "${1:?QMD config check script is required}" "$openclaw_bin"
 
 echo "openclaw qmd runtime: ok"

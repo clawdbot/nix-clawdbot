@@ -359,9 +359,9 @@ What I need you to do:
    - If ~/.openclaw/workspace already has files you want to keep, adopt them into the flake first (use copy/rsync that dereferences symlinks, e.g. `cp -L`)
 5. Help me create or connect the channel account I choose
 6. Set up secrets (bot token, provider key) - plain files at ~/.secrets/ are fine unless I already have a secret manager
-7. Ask whether I want local memory through QMD; if yes, set `memory.backend = "qmd"` in OpenClaw config
+7. Check the pinned OpenClaw memory schema before configuring local memory. Offer `memory.backend = "qmd"` only on legacy schemas that accept it; newer releases retired QMD backend integration
 8. Fill in the template placeholders and run home-manager switch
-9. Verify end-to-end: package builds, service is running, gateway health works, QMD works if enabled, and the bot/channel responds if configured
+9. Verify end-to-end: package builds, service is running, gateway health works, legacy QMD works if enabled, and the bot/channel responds if configured
 
 My setup:
 - OS: [macOS / Linux]
@@ -1092,9 +1092,11 @@ and `pkgs.openclawPackages.pnpm_12` when needed for packaging or debugging.
 
 ### Local memory
 
-QMD is the supported local memory backend when OpenClaw config opts into it. The default `openclaw` package does not build or install QMD unless `memory.backend = "qmd"` is set. Linux uses upstream `tobi/qmd`; Darwin uses the repaired `nix-openclaw-tools` package until upstream QMD is fixed there.
+QMD backend integration is **legacy-only**. It is available when the pinned
+OpenClaw generated schema accepts `memory.backend = "qmd"`, as in
+OpenClaw 2026.7.1-2. OpenClaw 2026.9.3 has retired this backend.
 
-Opt in through normal OpenClaw config:
+On a legacy schema, opt in through normal OpenClaw config:
 
 ```nix
 programs.openclaw.config = {
@@ -1102,11 +1104,25 @@ programs.openclaw.config = {
 };
 ```
 
-When enabled through the nix-openclaw modules, QMD stays inside the OpenClaw runtime PATH, so users do not need to install a separate `qmd` command. The builtin `memorySearch.provider = "local"` path is an escape hatch for people who want to manage `node-llama-cpp` themselves; it is not the primary Nix-supported path.
+Legacy opt-in keeps QMD inside the OpenClaw runtime PATH. The default package
+does not include QMD without opt-in. Linux uses upstream `tobi/qmd`; Darwin uses
+the repaired `nix-openclaw-tools` package.
+
+Before moving to a schema that retired QMD, remove `memory.backend`,
+`memory.qmd`, and `memory.search.qmd` from your Nix-authored OpenClaw config,
+then rebuild. Home Manager rejects these retired generated options; the NixOS
+module also rejects QMD opt-in and the two QMD subtrees in its raw `config`.
+Nix does not silently rewrite configuration or run Doctor during activation.
+An external NixOS `configFile` remains opaque and must be updated by its owner.
+
+Standalone QMD is still available as `pkgs.openclawPackages.qmd`, including
+explicit `home.packages` or NixOS `services.openclaw-gateway.servicePath` use.
+Installing the CLI does not restore OpenClaw backend integration or migrate
+existing memory data.
 
 Plugin CLIs are also kept on the OpenClaw runtime PATH by default, not on the user's login shell PATH. Set `programs.openclaw.exposePluginPackages = true` only when you explicitly want plugin CLIs in `home.packages`.
 
-Optional model prewarming is also declarative:
+Optional standalone model prewarming remains declarative on both schemas:
 
 ```nix
 programs.openclaw.qmd.prewarmModels.enable = true;
@@ -1124,7 +1140,7 @@ cache use.
 | Gateway binary | ✓ | |
 | macOS app | ✓ | |
 | Service (launchd/systemd) | ✓ | |
-| Runtime tools and QMD | ✓ | |
+| Runtime tools and legacy QMD opt-in | ✓ | |
 | Telegram bot token | | ✓ |
 | Anthropic API key | | ✓ |
 | Chat IDs | | ✓ |
@@ -1137,7 +1153,9 @@ The default `openclaw` package uses these tools internally and does not expose t
 
 **Core**: nodejs, pnpm, git, curl, jq, python3, ffmpeg, sox, ripgrep
 
-**Local memory**: QMD, pulled in only when `memory.backend = "qmd"` is set
+**Legacy local memory**: QMD, pulled in only when the generated schema accepts
+`memory.backend = "qmd"` and the instance opts in. Standalone CLI/prewarm use
+remains separate from backend support.
 
 **Default first-party tools** come from `nix-openclaw-tools`: gogcli (`gog`), goplaces, summarize, camsnap, sonoscli.
 

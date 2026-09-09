@@ -34,7 +34,7 @@ This repo ships a working Nix package for OpenClaw users, not just a pin mirror.
 - The gateway package must include Control UI assets.
 - No inline scripts or inline file contents in Nix code. Use repo scripts and explicit file paths.
 - Keep runtime tools internal to the `openclaw` wrapper unless they are intentionally part of the public package surface.
-- QMD is the Nix-supported local memory backend. Keep `qmd` internal to the OpenClaw runtime PATH, and pull it into the closure only when users opt in with upstream config.
+- QMD backend integration is legacy-only: the generated `memory.backend` option must accept `"qmd"`. Keep legacy opt-in internal to the OpenClaw runtime PATH. Newer schemas reject retired QMD configuration without translating it; standalone CLI packaging and explicit model prewarming remain supported.
 - The gateway npm wrapper lock (`nix/npm/openclaw/package-lock.json`) is resolved from scratch on every pin refresh, never updated in place: npm keeps stale nested transitive packages as targets of new direct dependency edges and drops the hoisted package, which `npm ci` then tries to fetch from the registry. The lock must be consumable without the registry; `nix/scripts/check-openclaw-npm-wrapper-lock.sh` proves that by re-running npm's resolver offline against an empty cache in a scratch copy, which must succeed and leave the lock byte-identical (subtrees upstream pins through `npm-shrinkwrap.json` are accepted), at pin time and before `npm ci` in the gateway build.
 - ACPX compatibility files are staged at build time from locked package inputs,
   not installed or repaired by npm at runtime.
@@ -46,6 +46,6 @@ This repo ships a working Nix package for OpenClaw users, not just a pin mirror.
 ### mcporter and QMD
 
 - `mcporter` is an OpenClaw-owned optional MCP/CLI bridge, not a QMD requirement.
-- OpenClaw defaults to direct `qmd` CLI execution. Keep that as the Nix-supported baseline until measured startup or per-query overhead proves otherwise.
+- Legacy OpenClaw QMD integration defaults to direct `qmd` CLI execution. Retired schemas do not support a QMD backend, even when the standalone CLI is installed.
 - Package `mcporter` in `nix-openclaw-tools` as an optional tool when needed, but do not add it to the default `openclaw` runtime PATH just because QMD is bundled.
-- If `memory.qmd.mcporter.enabled = true`, nix-openclaw should make `mcporter` visible to that instance and require the matching mcporter server config for `qmd mcp`.
+- On a legacy schema accepting `memory.qmd.mcporter.enabled = true`, nix-openclaw should make `mcporter` visible to that instance and require the matching mcporter server config for `qmd mcp`.
