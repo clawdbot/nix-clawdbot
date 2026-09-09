@@ -9,6 +9,7 @@ const installer = path.join(import.meta.dirname, "openclaw-gateway-npm-install.s
 const checker = path.join(import.meta.dirname, "check-package-contents.sh");
 const pluginInstaller = path.join(import.meta.dirname, "openclaw-runtime-plugin-install.mjs");
 const legacyNames = ["hasown", "combined-stream"];
+const acpxAliases = ["index.js", "register.runtime.js", "runtime-api.js", "setup-api.js"];
 
 function put(root, name, text = "") {
   const file = path.join(root, name);
@@ -22,6 +23,17 @@ function dependency(modules, name, marker, code) {
   put(root, "package.json", JSON.stringify({ name, version: `${marker}.0.0`, type: "commonjs", main: "index.cjs" }));
   put(root, "index.cjs", code ?? `module.exports = { marker: ${marker}, file: __filename };\n`);
   return root;
+}
+
+function snapshot(root) {
+  const files = {};
+  for (const name of fs.readdirSync(root, { recursive: true }).sort()) {
+    const file = path.join(root, name);
+    const stat = fs.lstatSync(file);
+    if (!stat.isDirectory())
+      files[name] = stat.isSymbolicLink() ? fs.readlinkSync(file) : fs.readFileSync(file).toString("hex");
+  }
+  return files;
 }
 
 function fixture(t, layout = "mixed") {
@@ -82,16 +94,14 @@ function loadBundledPluginPublicArtifactModuleSync() { return { fixture: true };
 export { loadBundledPluginPublicArtifactModuleSync };
 `,
   );
-  for (const name of [
-    "openclaw.plugin.json",
-    "package.json",
-    "index.js",
-    "register.runtime.js",
-    "runtime-api.js",
-    "setup-api.js",
-    "skills/acp-router/SKILL.md",
-  ])
-    put(acpx, name, "fixture");
+  put(acpx, "package.json", '{"name":"@fixture/acpx","type":"module"}');
+  put(acpx, "openclaw.plugin.json", '{"id":"acpx"}');
+  put(acpx, "skills/acp-router/SKILL.md", "fixture");
+  dependency(path.join(acpx, "node_modules"), "@fixture/acpx-dep", 9);
+  for (const name of acpxAliases) {
+    put(acpx, `dist/${name}`, 'export { default } from "@fixture/acpx-dep";\n');
+    fs.symlinkSync(`dist/${name}`, path.join(acpx, name));
+  }
   put(modules, ".fixture-marker", "retained");
   const bin = put(limit, "bin/marker", "#!/bin/sh\nexit 0\n");
   fs.chmodSync(bin, 0o755);
@@ -131,6 +141,7 @@ fs.writeFileSync(path.join(process.env.OPENCLAW_PACKAGE_ROOT, "patch-seen"), "pa
     acpx,
     env,
     run,
+    node: (code, ...args) => run(process.execPath, ["--input-type=module", "-e", code, ...args]),
     install: () =>
       run("sh", [installer], {
         cwd: build,
@@ -158,9 +169,7 @@ function install(f) {
 }
 
 function resolveFrom(f, owner, names) {
-  return f.run(process.execPath, [
-    "--input-type=module",
-    "-e",
+  return f.node(
     `
 import { createRequire } from "node:module";
 const require = createRequire(process.argv[1]);
@@ -168,7 +177,7 @@ console.log(JSON.stringify(JSON.parse(process.argv[2]).map(name => require(name)
 `,
     owner,
     JSON.stringify(names),
-  ]);
+  );
 }
 
 for (const layout of ["mixed", "nested", "hoisted"]) {
@@ -204,7 +213,6 @@ for (const layout of ["mixed", "nested", "hoisted"]) {
       "dist-runtime/extensions/memory-core/openclaw.plugin.json",
     ])
       assert.equal(fs.readFileSync(path.join(f.root, rel), "utf8"), '{"id":"memory-core"}');
-    assert.equal(fs.readlinkSync(path.join(f.root, "dist-runtime/extensions/acpx")), f.acpx);
     assert.deepEqual(fs.readFileSync(path.join(f.out, "wrapper-args"), "utf8").trim().split("\n"), [
       process.execPath,
       path.join(f.out, "bin/openclaw"),
@@ -223,6 +231,64 @@ for (const layout of ["mixed", "nested", "hoisted"]) {
     ]);
   });
 }
+
+for (const ext of ["js", "mjs"]) {
+  test(`${ext}: staged relative imports retain one canonical module graph`, (t) => {
+    const f = fixture(t);
+    const entry = "extensions/memory-core/provider-policy-api.js";
+    put(f.packageRoot, `dist/${entry}`, `export { state } from "../../state.${ext}";\n`);
+    put(f.packageRoot, `dist/state.${ext}`, `export { state } from "./nested/state.${ext}";\n`);
+    put(f.packageRoot, `dist/nested/state.${ext}`, "export const state = {};\n");
+    const original = snapshot(path.join(f.packageRoot, "dist"));
+    install(f);
+    const copied = snapshot(path.join(f.root, "dist"));
+    for (const name of Object.keys(copied)) if (name.startsWith("extensions/acpx/")) delete copied[name];
+    assert.deepEqual(copied, original);
+    const code = `
+import assert from "node:assert/strict";
+import { pathToFileURL } from "node:url";
+const [root, entry] = process.argv.slice(1);
+const staged = await import(pathToFileURL(root + "/dist-runtime/" + entry));
+const direct = await import(pathToFileURL(root + "/dist/" + entry));
+assert.strictEqual(staged.state, direct.state);
+`;
+    const loaded = f.node(code, f.root, entry);
+    assert.equal(loaded.status, 0, loaded.stderr);
+    fs.unlinkSync(path.join(f.root, `dist/nested/state.${ext}`));
+    const missing = f.node(code, f.root, entry);
+    assert.notEqual(missing.status, 0);
+    assert.match(missing.stderr, /ERR_MODULE_NOT_FOUND/);
+  });
+}
+
+test("bundled ACPX stays physically contained with its complete built closure", (t) => {
+  const f = fixture(t);
+  const original = snapshot(f.acpx);
+  install(f);
+  for (const spelling of ["dist-runtime", "dist"]) {
+    const bundled = fs.realpathSync(path.join(f.root, spelling, "extensions"));
+    const acpx = path.join(bundled, "acpx");
+    assert.ok(fs.realpathSync(acpx).startsWith(`${bundled}/`), "ACPX package directory escapes bundled root");
+    assert.deepEqual(snapshot(acpx), original);
+  }
+  assert.deepEqual(snapshot(f.acpx), original);
+  fs.rmSync(f.acpx, { recursive: true });
+  const result = f.node(
+    `
+import assert from "node:assert/strict";
+import { pathToFileURL } from "node:url";
+for (const dir of ["dist", "dist-runtime"]) for (const name of JSON.parse(process.argv[2])) {
+  const { default: dependency } = await import(pathToFileURL(process.argv[1] + "/" + dir + "/extensions/acpx/" + name));
+  assert.equal(dependency.marker, 9);
+  assert.ok(dependency.file.startsWith(process.argv[3] + "/"));
+}
+`,
+    f.root,
+    JSON.stringify(acpxAliases),
+    f.out,
+  );
+  assert.equal(result.status, 0, result.stderr);
+});
 
 test("dangling hoisted sibling links are rejected before wrapping", (t) => {
   const f = fixture(t);

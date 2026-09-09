@@ -77,9 +77,9 @@ stage_dist_runtime() {
     return 0
   fi
 
-  mkdir -p "$root/dist-runtime"
-  rm -rf "$root/dist-runtime/extensions"
-  cp -R "$root/dist/extensions" "$root/dist-runtime/extensions"
+  # Keep relative chunk imports and module identity on the canonical dist graph.
+  rm -rf "$root/dist-runtime"
+  ln -s dist "$root/dist-runtime"
 }
 
 stage_acpx() {
@@ -91,10 +91,11 @@ stage_acpx() {
     exit 1
   fi
 
-  acpx_root="$root/dist-runtime/extensions/acpx"
+  acpx_root="$root/dist/extensions/acpx"
   rm -rf "$acpx_root"
-  mkdir -p "$(dirname "$acpx_root")"
-  ln -s "$OPENCLAW_BUNDLED_ACPX" "$acpx_root"
+  # Bundled plugin discovery requires physical containment, not a store-root link.
+  mkdir -p "$acpx_root"
+  cp -R "$OPENCLAW_BUNDLED_ACPX/." "$acpx_root/"
 }
 
 ensure_legacy_node_module_entry() {
