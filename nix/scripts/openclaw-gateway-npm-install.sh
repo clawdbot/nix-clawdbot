@@ -25,14 +25,17 @@ if [ ! -d "$package_root" ]; then
 fi
 
 root="$out/lib/openclaw"
-mkdir -p "$root" "$out/bin"
+modules_root="$out/lib/node_modules"
+mkdir -p "$modules_root" "$out/bin"
 
 log_step() {
   printf 'openclaw npm install: %s\n' "$1"
 }
 
-log_step "copy package"
-cp -R "$package_root/." "$root/"
+log_step "copy installed dependency tree"
+# npm hoists dependencies beside openclaw; keep that locked tree and its realpaths.
+cp -R node_modules/. "$modules_root/"
+ln -s node_modules/openclaw "$root"
 log_step "patch npm dist"
 OPENCLAW_PACKAGE_ROOT="$root" "$NODE_BIN" "$OPENCLAW_PATCH_NPM_DIST_SCRIPT"
 
@@ -96,7 +99,7 @@ stage_acpx() {
 
 ensure_legacy_node_module_entry() {
   package="$1"
-  if [ -e "$root/node_modules/$package" ]; then
+  if [ -e "$root/node_modules/$package" ] || [ -e "$modules_root/$package" ] || [ ! -d "$root/node_modules" ]; then
     return 0
   fi
 
@@ -117,8 +120,7 @@ ensure_legacy_node_module_entry combined-stream
 ensure_legacy_node_module_entry hasown
 
 log_step "check symlinks"
-check_no_broken_symlinks "$root/node_modules"
-check_no_broken_symlinks "$root/dist-runtime"
+check_no_broken_symlinks "$out/lib"
 
 log_step "wrap openclaw"
 export root

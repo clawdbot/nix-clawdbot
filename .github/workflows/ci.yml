@@ -65,6 +65,7 @@ jobs:
             nix/scripts/openclaw-runtime-plugin-prepare-npm.test.mjs \
             nix/scripts/check-openclaw-runtime-plugin-locks.test.mjs \
             nix/scripts/check-openclaw-npm-wrapper-lock.test.mjs \
+            nix/scripts/openclaw-gateway-npm-install.test.mjs \
             nix/scripts/patch-openclaw-npm-dist.test.mjs \
             nix/scripts/normalize-pnpm-store-index.test.js
 

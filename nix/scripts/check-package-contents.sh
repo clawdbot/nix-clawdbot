@@ -33,13 +33,10 @@ for template in AGENTS SOUL IDENTITY USER BOOTSTRAP TOOLS; do
   require_path "${root}/docs/reference/templates/${template}.md"
 done
 require_path "${root}/skills"
-if find "${root}/node_modules" -path "*/form-data/package.json" -type f -print | grep -q .; then
-  require_path "${root}/node_modules/hasown"
-  require_path "${root}/node_modules/combined-stream"
-fi
 
 node --input-type=module <<'NODE'
 import fs from "node:fs";
+import { createRequire } from "node:module";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -47,6 +44,16 @@ const root = path.join(process.env.OPENCLAW_GATEWAY, "lib/openclaw");
 const packageJson = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
 if (packageJson.files.includes("src/agents/templates/")) {
   fs.accessSync(path.join(root, "src/agents/templates/HEARTBEAT.md"));
+}
+const npmModules = path.join(process.env.OPENCLAW_GATEWAY, "lib/node_modules");
+const modules = fs.existsSync(npmModules) ? npmModules : path.join(root, "node_modules");
+if (fs.existsSync(modules)) {
+  for (const file of fs.readdirSync(modules, { recursive: true })) {
+    if (path.basename(file) === "package.json" && path.basename(path.dirname(file)) === "form-data") {
+      const require = createRequire(path.resolve(modules, file));
+      for (const dependency of ["hasown", "combined-stream"]) require.resolve(dependency);
+    }
+  }
 }
 const dist = path.join(root, "dist");
 const loaders = fs.readdirSync(dist, { withFileTypes: true })
