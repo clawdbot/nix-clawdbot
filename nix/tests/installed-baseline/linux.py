@@ -13,4 +13,4 @@ command = (
     "/home/baseline/qualification /etc/installed-baseline/activation "
     "/etc/installed-baseline/bundle /etc/installed-baseline/node/bin/node"
 )
-machine.succeed(f"cd / && su baseline -c {shlex.quote(command)}")
+print(machine.succeed(f"cd / && su baseline -c {shlex.quote(command)}"), end="", flush=True)
