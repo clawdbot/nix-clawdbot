@@ -191,10 +191,10 @@ class Service:
             )
             remaining = sorted(pid for pid in self.observed if alive(pid))
             if inactive and not remaining:
-                print(json.dumps({"cleanup": "verified", "service": state,
-                                  "observedPids": sorted(self.observed)}), flush=True)
                 if observation_error:
                     raise RuntimeError("cleanup had an observation/stop failure") from observation_error
+                print(json.dumps({"cleanup": "verified", "service": state,
+                                  "observedPids": sorted(self.observed)}), flush=True)
                 return False
             if time.monotonic() >= deadline:
                 raise RuntimeError(f"cleanup unproven: service={state}, survivingPids={remaining}")

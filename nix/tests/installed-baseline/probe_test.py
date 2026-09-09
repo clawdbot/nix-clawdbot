@@ -206,6 +206,23 @@ class UpgradeWitnessTests(unittest.TestCase):
 
 
 class CleanupTests(unittest.TestCase):
+    def test_observation_error_or_stop_timeout_never_emits_verified_receipt(self):
+        for darwin in (False, True):
+            for observation_failed in (False, True):
+                with self.subTest(darwin=darwin, observation_failed=observation_failed):
+                    instance = service.Service(Path("/fixture"), darwin, {})
+                    stopped = {"registered": not darwin, "active": "inactive", "pid": 0}
+                    initial = RuntimeError("observation failed") if observation_failed else stopped
+                    stop_error = None if observation_failed else subprocess.TimeoutExpired("stop", 15)
+                    output = io.StringIO()
+                    with patch.object(instance, "state", side_effect=[initial, stopped]), \
+                         patch.object(service, "run", side_effect=stop_error), \
+                         contextlib.redirect_stdout(output):
+                        with self.assertRaisesRegex(RuntimeError, "observation/stop failure"):
+                            with instance:
+                                pass
+                    self.assertNotIn('"cleanup": "verified"', output.getvalue())
+
     def test_real_interrupted_child_is_terminated_and_reaped_before_propagating(self):
         def interrupted(signum, frame):
             raise RuntimeError("fixture interruption")
