@@ -1108,7 +1108,12 @@ Legacy opt-in keeps QMD inside the OpenClaw runtime PATH. The default package
 does not include QMD without opt-in. Linux uses upstream `tobi/qmd`; Darwin uses
 the repaired `nix-openclaw-tools` package.
 
-Before moving to a schema that retired QMD, remove `memory.backend`,
+Before removing QMD settings, carry custom paths and extra collections
+(including `{ path, pattern }` globs) into `memory.search.extraPaths` in your
+Nix source. Also carry over any enabled session-indexing settings and sources,
+following the [upstream QMD migration guide](https://docs.openclaw.ai/concepts/memory-builtin#migrating-from-qmd).
+
+After carrying those settings over, remove the retired `memory.backend`,
 `memory.qmd`, and `memory.search.qmd` from your Nix-authored OpenClaw config,
 then rebuild. Home Manager rejects these retired generated options; the NixOS
 module also rejects QMD opt-in and the two QMD subtrees in its raw `config`.
