@@ -13,6 +13,8 @@ Older repository history is available in git.
 **Highlights:** Nix-managed skills remain discoverable with OpenClaw’s hardlink checks, and documented home-relative paths work consistently across Home Manager activation and gateway services. Changes below cover the package state since `v2026.7.1`.
 
 - Admit @vincentkoc to the existing maintainer-only CI actor lists for provenance, Linux, and macOS validation (2026-09-09).
+- Add an opt-in, non-main installed-baseline qualification for the unmodified `v2026.7.1` Nix recipe, using a disposable Linux VM and isolated macOS Home Manager profile. Build or startup failures block qualification without substituting packages; installed-generation upgrades remain unproven (2026-09-09).
+- Clarify that Home Manager generations restore package/configuration selections, not OpenClaw's mutable state or database schema; remove unconditional instant-rollback claims (2026-09-09).
 - Run Linux JavaScript contract tests with Node.js 22 from the repository's locked Nixpkgs input and disable the global flake registry for that command, avoiding registry fetch failures (2026-09-09).
 - Materialize configured user and plugin skills as per-instance runtime copies, preserving all-agent discovery, extra load paths, and cleanup boundaries; thanks @vsumner (#118).
 - Resolve leading `~/` in instance state, workspace, and config paths consistently for managed files, runtime profiles, and launchd/systemd services, including paths containing spaces and quotes; thanks @SebTardif (#130).

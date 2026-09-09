@@ -69,7 +69,7 @@ You talk to Telegram, your machine does things.
 
 **Tool plugins are self-contained.** Each nix-openclaw tool plugin declares its CLI tools in Nix. You enable it, the build and wiring happens automatically.
 
-**Bulletproof.** Nix locks every dependency. No version drift, no surprises. `home-manager switch` to update, `home-manager generations` to rollback instantly.
+**Pinned packages.** Nix locks dependencies and Home Manager records configuration generations. Those generations do not back up or rewind OpenClaw's mutable state.
 
 ---
 
@@ -303,7 +303,7 @@ You've probably installed tools before. Homebrew, pip, npm - they work until the
 
 **What Nix gives you:**
 - Every dependency pinned to exact versions. Forever.
-- Update breaks something? `home-manager switch --rollback` - back in 30 seconds.
+- Home Manager can reactivate an earlier package/configuration generation. Before downgrading OpenClaw, verify state-schema compatibility and retain a compatible state backup; a profile rollback does not reverse database migrations.
 - Share your config file, get the exact same setup on another machine.
 - **Plugins just work.** Add a GitHub URL, run one command, done. Nix handles the build, dependencies, and wiring.
 - Tools don't pollute your system - they live in isolation.
@@ -320,7 +320,7 @@ Nix is a **declarative package manager**. Instead of running commands to install
 **The hashing magic:** Every package in Nix is identified by a cryptographic hash of *all* its inputs - source code, dependencies, build flags, everything. Change anything, get a different hash. This means:
 - Two machines with the same hash have *identical* builds. Byte-for-byte.
 - Old versions stick around (different hash = different path). Nothing gets overwritten.
-- Rollback is instant - just point to the old hash.
+- A package-generation pointer can select an older store path; reactivation and OpenClaw state compatibility are separate, and database migrations are not reversed by changing that pointer.
 
 **Key terms you'll see:**
 - **Flake**: A config file (`flake.nix`) that pins all your dependencies. Think `package-lock.json` but for your entire system.
@@ -1073,10 +1073,14 @@ journalctl --user -u openclaw-gateway -f
 # Linux: restart
 systemctl --user restart openclaw-gateway
 
-# Rollback
+# Rollback only after verifying state compatibility and retaining a compatible backup
 home-manager generations  # list
-home-manager switch --rollback  # revert
+home-manager switch --rollback  # reactivate the previous package/configuration generation
 ```
+
+Reactivate an earlier generation only after verifying OpenClaw state compatibility
+and retaining a compatible backup. An older gateway can reject a database written
+by a newer release; Home Manager does not restore that database from backup.
 
 ### Packages
 

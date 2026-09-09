@@ -5,7 +5,12 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      qualify_installed_baseline:
+        description: Realize and probe the authentic v2026.7.1 installed baseline
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -68,6 +73,9 @@ jobs:
             nix/scripts/openclaw-gateway-npm-install.test.mjs \
             nix/scripts/patch-openclaw-npm-dist.test.mjs \
             nix/scripts/normalize-pnpm-store-index.test.js
+
+      - name: Test installed-baseline profile isolation
+        run: python3 -B nix/tests/installed-baseline/probe_test.py -v
 
       - name: Inspect flake outputs
         run: nix flake show --accept-flake-config
@@ -132,6 +140,38 @@ jobs:
             --out-link result-platform-activation \
             .#checks.aarch64-darwin.platform-activation
           OPENCLAW_HM_ACTIVATION_PACKAGE="$PWD/result-platform-activation" scripts/hm-activation-macos.sh
+
+  installed-baseline:
+    name: Installed baseline (${{ matrix.system }})
+    needs: flake-input-provenance
+    if: >-
+      ${{
+        github.event_name == 'workflow_dispatch' &&
+        inputs.qualify_installed_baseline &&
+        startsWith(github.ref, 'refs/heads/') &&
+        github.ref != 'refs/heads/main'
+      }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - system: x86_64-linux
+            runner: ubuntu-latest
+          - system: aarch64-darwin
+            runner: macos-14
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31.11.1
+
+      - name: Realize and probe installed baseline
+        run: |
+          python3 -B nix/tests/installed-baseline/probe_test.py -v
+          bash maintainers/scripts/qualify-installed-baseline.sh ${{ matrix.system }}
 
   publish-mirrored-release-tag:
     name: Publish mirrored release tag
